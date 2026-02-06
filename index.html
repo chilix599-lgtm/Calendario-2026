@@ -6,22 +6,31 @@
     <title>Agenda 26 - Inteligente</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
-        h1 { text-align: center; margin-bottom: 20px; }
+        h1 { text-align: center; margin-bottom: 10px; }
         
-        /* Controles */
+        /* Controles Fijos */
         .controls { 
             position: sticky; top: 10px; background: white; padding: 15px; 
             border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 15px; z-index: 100;
+            display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; z-index: 100;
             margin-bottom: 30px;
         }
+
+        .tool-section { display: flex; align-items: center; gap: 10px; border-right: 1px solid #eee; padding-right: 20px; }
+        .tool-section:last-child { border-right: none; }
+
         .search-container { position: relative; display: flex; align-items: center; }
         .search-input { 
             padding: 8px 12px 8px 35px; border: 2px solid #ddd; border-radius: 20px; 
-            outline: none; transition: 0.3s; width: 200px;
+            outline: none; transition: 0.3s; width: 180px;
         }
-        .search-input:focus { border-color: #007bff; width: 250px; }
+        .search-input:focus { border-color: #007bff; width: 220px; }
         .search-icon { position: absolute; left: 12px; color: #999; }
+
+        .color-btn { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 3px solid #eee; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .color-btn.active { border-color: #007bff; transform: scale(1.1); box-shadow: 0 0 8px rgba(0,123,255,0.4); }
+        .bg-red { background-color: #f8d7da; color: #721c24; }
+        .bg-white { background-color: #ffffff; border: 3px solid #ddd; }
 
         .btn-print {
             background: #28a745; color: white; border: none; padding: 8px 16px;
@@ -33,63 +42,39 @@
             display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
             gap: 25px; 
         }
-        .month { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.3s; }
-        .month.hidden { display: none; } 
+        .month { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .month.hidden { display: none; }
         
         .month-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #f0f0f0; padding-bottom: 5px; }
         .month-title { text-transform: capitalize; font-weight: bold; font-size: 1.1rem; }
-        .clear-month { font-size: 0.7rem; color: #999; cursor: pointer; text-decoration: underline; }
         
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .day-header { font-size: 0.75rem; text-align: center; color: #bbb; font-weight: 600; }
         
         .day { 
-            border: 1px solid #f0f0f0; min-height: 65px; padding: 6px; 
-            cursor: pointer; border-radius: 6px; transition: 0.2s;
-            display: flex; flex-direction: column; position: relative;
+            border: 1px solid #f0f0f0; min-height: 60px; padding: 6px; 
+            cursor: pointer; border-radius: 6px; position: relative;
+            display: flex; flex-direction: column; transition: background 0.2s;
         }
-        .day:hover { border-color: #007bff; }
-        .day.fade { opacity: 0.2; transform: scale(0.95); }
-        .day.highlight { border: 2px solid #007bff; box-shadow: 0 0 10px rgba(0,123,255,0.3); }
+        .day.today { border: 2px solid #007bff; background-color: #e7f1ff; }
+        .day.fade { opacity: 0.15; }
+        .day.highlight { box-shadow: 0 0 10px rgba(0,123,255,0.5); border-color: #007bff; }
 
-        /* Estilo para Importantes (Rojo) */
-        .day.important { background-color: #dc3545 !important; color: white !important; border-color: #b21f2d; }
-        .day.important .day-preview { color: #ffeaea; }
-        .day.important .btn-important { color: white; opacity: 1; }
-
-        .day-header-row { display: flex; justify-content: space-between; align-items: flex-start; }
         .day-number { font-size: 0.85rem; font-weight: bold; }
-        .btn-important { 
-            font-size: 0.8rem; border: none; background: transparent; 
-            cursor: pointer; opacity: 0.2; transition: 0.2s; padding: 0;
-        }
-        .day:hover .btn-important { opacity: 1; }
-
-        .day-preview { font-size: 0.65rem; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 4px; }
+        .weather-tag { position: absolute; top: 4px; right: 4px; font-size: 0.7rem; color: #555; background: rgba(255,255,255,0.8); padding: 1px 4px; border-radius: 4px; }
+        
+        .day-preview { font-size: 0.65rem; color: #666; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
         /* Modal */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;
-            backdrop-filter: blur(2px);
         }
-        .modal-content {
-            background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 450px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: pop 0.25s ease;
-        }
-        @keyframes pop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        
-        .modal-textarea { 
-            width: 100%; height: 180px; border: 1px solid #eee; border-radius: 10px; 
-            padding: 15px; font-size: 1rem; outline: none; box-sizing: border-box; resize: none;
-        }
-        .btn-save { width: 100%; margin-top: 15px; padding: 12px; border: none; background: #007bff; color: white; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; }
+        .modal-textarea { width: 100%; height: 150px; margin-top: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; resize: none; }
+        .btn-save { width: 100%; margin-top: 10px; padding: 10px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; }
 
-        @media print {
-            .controls, .clear-month, .btn-important { display: none !important; }
-            .calendar-grid { display: block; }
-            .month { border: 1px solid #eee; margin-bottom: 20px; page-break-inside: avoid; }
-        }
+        @media print { .controls { display: none !important; } }
     </style>
 </head>
 <body>
@@ -97,99 +82,80 @@
     <h1>📅 Agenda 26</h1>
 
     <div class="controls">
-        <div class="search-container">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Buscar en mis notas..." oninput="handleSearch()">
+        <div class="tool-section">
+            <span style="font-size: 0.9rem; font-weight: bold;">Herramientas:</span>
+            <div id="btnWhite" class="color-btn bg-white active" onclick="setTool('white')" title="Modo Normal / Despintar">⚪</div>
+            <div id="btnRed" class="color-btn bg-red" onclick="setTool('#f8d7da')" title="Marcar como Importante">🚩</div>
         </div>
 
-        <button class="btn-print" onclick="window.print()">🖨️ Imprimir / PDF</button>
+        <div class="tool-section">
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar notas..." oninput="handleSearch()">
+            </div>
+        </div>
+
+        <button class="btn-print" onclick="window.print()">🖨️ PDF / Imprimir</button>
     </div>
 
     <div id="calendar" class="calendar-grid"></div>
 
     <div id="dayModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <div id="modalDate" style="font-size: 1.2rem; font-weight: bold; color: #333;"></div>
-                <span style="cursor: pointer; font-size: 1.5rem; color: #333;" onclick="closeModal()">&times;</span>
-            </div>
-            <textarea id="modalText" class="modal-textarea" placeholder="Escribe tus notas aquí..."></textarea>
-            <button class="btn-save" onclick="saveFromModal()">Guardar Nota</button>
+            <h3 id="modalDate" style="margin:0"></h3>
+            <textarea id="modalText" class="modal-textarea"></textarea>
+            <button class="btn-save" onclick="saveFromModal()">Guardar Cambios</button>
+            <button style="width:100%; margin-top:5px; background:none; border:none; color:gray; cursor:pointer;" onclick="closeModal()">Cancelar</button>
         </div>
     </div>
 
     <script>
+        let selectedToolColor = 'white';
         let currentEditingDayId = null;
         const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
         const dayNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
-        function load() { return JSON.parse(localStorage.getItem('cal2026') || '{}'); }
+        function setTool(color) {
+            selectedToolColor = color;
+            document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
+            if(color === 'white') document.getElementById('btnWhite').classList.add('active');
+            else document.getElementById('btnRed').classList.add('active');
+        }
+
+        function load() { return JSON.parse(localStorage.getItem('agenda2026') || '{}'); }
 
         function save(id, value, type) {
             const data = load();
             if (!data[id]) data[id] = {};
             data[id][type] = value;
-            localStorage.setItem('cal2026', JSON.stringify(data));
+            localStorage.setItem('agenda2026', JSON.stringify(data));
         }
 
-        function toggleImportant(e, dayId) {
-            e.stopPropagation(); // Evita que se abra el modal al hacer clic en el pin
+        function handleDayClick(dayId, dateText) {
+            // Aplicar el color de la herramienta actual inmediatamente
+            save(dayId, selectedToolColor, 'color');
+            
+            // Abrir modal para editar texto
+            currentEditingDayId = dayId;
             const data = load();
-            const isCurrentlyImportant = data[dayId]?.important || false;
-            save(dayId, !isCurrentlyImportant, 'important');
-            renderCalendar();
-            handleSearch();
-        }
-
-        function clearMonth(monthIndex) {
-            if(confirm(`¿Borrar todo en ${months[monthIndex]}?`)) {
-                const data = load();
-                Object.keys(data).forEach(key => { if(key.startsWith(`${monthIndex}-`)) delete data[key]; });
-                localStorage.setItem('cal2026', JSON.stringify(data));
-                renderCalendar();
-            }
+            document.getElementById('modalDate').innerText = dateText;
+            document.getElementById('modalText').value = data[dayId]?.text || '';
+            document.getElementById('dayModal').style.display = 'flex';
         }
 
         function handleSearch() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const monthDivs = document.querySelectorAll('.month');
-
-            monthDivs.forEach(month => {
-                let monthHasMatch = false;
-                const monthDays = month.querySelectorAll('.day');
-                
-                monthDays.forEach(day => {
-                    const text = day.querySelector('.day-preview').innerText.toLowerCase();
-                    if (query === "") {
-                        day.classList.remove('fade', 'highlight');
-                        monthHasMatch = true;
-                    } else if (text.includes(query)) {
-                        day.classList.remove('fade');
-                        day.classList.add('highlight');
-                        monthHasMatch = true;
-                    } else {
-                        day.classList.add('fade');
-                        day.classList.remove('highlight');
-                    }
-                });
-
-                if (monthHasMatch) month.classList.remove('hidden');
-                else month.classList.add('hidden');
+            document.querySelectorAll('.day').forEach(day => {
+                const text = day.querySelector('.day-preview').innerText.toLowerCase();
+                if (query === "") day.classList.remove('fade', 'highlight');
+                else if (text.includes(query)) { day.classList.remove('fade'); day.classList.add('highlight'); }
+                else day.classList.add('fade');
             });
-        }
-
-        function openModal(dayId, fullDate) {
-            currentEditingDayId = dayId;
-            const data = load();
-            document.getElementById('modalDate').innerText = fullDate;
-            document.getElementById('modalText').value = data[dayId]?.text || '';
-            document.getElementById('dayModal').style.display = 'flex';
         }
 
         function closeModal() {
             document.getElementById('dayModal').style.display = 'none';
             renderCalendar();
-            handleSearch();
         }
 
         function saveFromModal() {
@@ -201,11 +167,13 @@
             const container = document.getElementById('calendar');
             container.innerHTML = '';
             const savedData = load();
+            const today = new Date();
+            const isYear2026 = today.getFullYear() === 2026;
 
             months.forEach((monthName, monthIndex) => {
                 const monthDiv = document.createElement('div');
                 monthDiv.className = 'month';
-                monthDiv.innerHTML = `<div class="month-header"><div class="month-title">${monthName}</div><div class="clear-month" onclick="clearMonth(${monthIndex})">Limpiar</div></div>`;
+                monthDiv.innerHTML = `<div class="month-header"><div class="month-title">${monthName}</div></div>`;
                 
                 const daysGrid = document.createElement('div');
                 daysGrid.className = 'days-grid';
@@ -219,19 +187,18 @@
                 for (let d = 1; d <= daysInMonth; d++) {
                     const dayId = `${monthIndex}-${d}`;
                     const dayData = savedData[dayId] || {};
-                    const isImportant = dayData.important || false;
+                    const isToday = isYear2026 && today.getMonth() === monthIndex && today.getDate() === d;
                     
                     const dayDiv = document.createElement('div');
-                    dayDiv.className = `day ${isImportant ? 'important' : ''}`;
-                    dayDiv.onclick = () => openModal(dayId, `${d} de ${monthName}`);
+                    dayDiv.className = `day ${isToday ? 'today' : ''}`;
+                    dayDiv.style.backgroundColor = dayData.color || 'white';
+                    dayDiv.onclick = () => handleDayClick(dayId, `${d} de ${monthName}`);
+                    
+                    let weatherHtml = isToday ? `<span class="weather-tag">☀️ 18°C</span>` : '';
                     
                     dayDiv.innerHTML = `
-                        <div class="day-header-row">
-                            <div class="day-number">${d}</div>
-                            <button class="btn-important" onclick="toggleImportant(event, '${dayId}')" title="Marcar como importante">
-                                ${isImportant ? '📍' : '📌'}
-                            </button>
-                        </div>
+                        ${weatherHtml}
+                        <div class="day-number">${d}</div>
                         <div class="day-preview">${dayData.text || ''}</div>
                     `;
                     daysGrid.appendChild(dayDiv);
@@ -239,6 +206,7 @@
                 monthDiv.appendChild(daysGrid);
                 container.appendChild(monthDiv);
             });
+            handleSearch();
         }
 
         window.onclick = (e) => { if (e.target.id == 'dayModal') closeModal(); }
