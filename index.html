@@ -8,7 +8,6 @@
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
         h1 { text-align: center; margin-bottom: 10px; }
         
-        /* Controles Fijos */
         .controls { 
             position: sticky; top: 10px; background: white; padding: 15px; 
             border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -19,62 +18,60 @@
         .tool-section { display: flex; align-items: center; gap: 10px; border-right: 1px solid #eee; padding-right: 20px; }
         .tool-section:last-child { border-right: none; }
 
-        .search-container { position: relative; display: flex; align-items: center; }
-        .search-input { 
-            padding: 8px 12px 8px 35px; border: 2px solid #ddd; border-radius: 20px; 
-            outline: none; transition: 0.3s; width: 180px;
-        }
-        .search-input:focus { border-color: #007bff; width: 220px; }
-        .search-icon { position: absolute; left: 12px; color: #999; }
-
-        .color-btn { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 3px solid #eee; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .color-btn { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 3px solid #eee; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .color-btn.active { border-color: #007bff; transform: scale(1.1); box-shadow: 0 0 8px rgba(0,123,255,0.4); }
-        .bg-red { background-color: #f8d7da; color: #721c24; }
+        .bg-red { background-color: #f8d7da; }
         .bg-white { background-color: #ffffff; border: 3px solid #ddd; }
 
-        .btn-print {
-            background: #28a745; color: white; border: none; padding: 8px 16px;
-            border-radius: 8px; cursor: pointer; font-weight: bold;
-        }
+        .search-container { position: relative; display: flex; align-items: center; }
+        .search-input { padding: 8px 12px 8px 35px; border: 2px solid #ddd; border-radius: 20px; width: 180px; outline: none; }
+        .search-icon { position: absolute; left: 12px; color: #999; }
 
-        /* Grilla */
-        .calendar-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-            gap: 25px; 
-        }
-        .month { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .month.hidden { display: none; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .month { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         
-        .month-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #f0f0f0; padding-bottom: 5px; }
-        .month-title { text-transform: capitalize; font-weight: bold; font-size: 1.1rem; }
+        .month-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
+        .month-title { text-transform: capitalize; font-weight: bold; }
         
-        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .day-header { font-size: 0.75rem; text-align: center; color: #bbb; font-weight: 600; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .day-header { font-size: 0.7rem; text-align: center; color: #bbb; font-weight: 600; padding-bottom: 5px; }
         
+        /* Celdas con tamaño fijo y scroll */
         .day { 
-            border: 1px solid #f0f0f0; min-height: 60px; padding: 6px; 
-            cursor: pointer; border-radius: 6px; position: relative;
-            display: flex; flex-direction: column; transition: background 0.2s;
+            border: 1px solid #f0f0f0; 
+            height: 80px; /* Altura fija para no deformar */
+            padding: 5px; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; /* Evita que el contenido se salga */
         }
-        .day.today { border: 2px solid #007bff; background-color: #e7f1ff; }
+        .day.today { border: 2px solid #007bff; background-color: #f0f7ff; }
         .day.fade { opacity: 0.15; }
-        .day.highlight { box-shadow: 0 0 10px rgba(0,123,255,0.5); border-color: #007bff; }
+        .day.highlight { border: 2px solid #007bff; box-shadow: 0 0 8px rgba(0,123,255,0.4); }
 
-        .day-number { font-size: 0.85rem; font-weight: bold; }
-        .weather-tag { position: absolute; top: 4px; right: 4px; font-size: 0.7rem; color: #555; background: rgba(255,255,255,0.8); padding: 1px 4px; border-radius: 4px; }
+        .day-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+        .day-number { font-size: 0.8rem; font-weight: bold; }
+        .weather-tag { font-size: 0.65rem; color: #666; }
         
-        .day-preview { font-size: 0.65rem; color: #666; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        /* Contenedor de nota con scroll interno */
+        .day-preview { 
+            font-size: 0.6rem; 
+            color: #444; 
+            overflow-y: auto; /* Scroll si el texto es largo */
+            word-wrap: break-word;
+            flex-grow: 1;
+            scrollbar-width: thin; /* Para navegadores modernos */
+        }
 
         /* Modal */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; }
-        .modal-textarea { width: 100%; height: 150px; margin-top: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; resize: none; }
-        .btn-save { width: 100%; margin-top: 10px; padding: 10px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        .modal-textarea { width: 100%; height: 150px; margin-top: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; resize: none; box-sizing: border-box; }
+        .btn-save { width: 100%; margin-top: 10px; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-        @media print { .controls { display: none !important; } }
+        @media print { .controls { display: none !important; } .day { height: auto; min-height: 60px; } }
     </style>
 </head>
 <body>
@@ -83,29 +80,29 @@
 
     <div class="controls">
         <div class="tool-section">
-            <span style="font-size: 0.9rem; font-weight: bold;">Herramientas:</span>
-            <div id="btnWhite" class="color-btn bg-white active" onclick="setTool('white')" title="Modo Normal / Despintar">⚪</div>
-            <div id="btnRed" class="color-btn bg-red" onclick="setTool('#f8d7da')" title="Marcar como Importante">🚩</div>
+            <span style="font-size: 0.85rem; font-weight: bold;">Color:</span>
+            <div id="btnWhite" class="color-btn bg-white active" onclick="setTool('white')" title="Normal / Despintar">⚪</div>
+            <div id="btnRed" class="color-btn bg-red" onclick="setTool('#f8d7da')" title="Importante">🚩</div>
         </div>
 
         <div class="tool-section">
             <div class="search-container">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" class="search-input" placeholder="Buscar notas..." oninput="handleSearch()">
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar..." oninput="handleSearch()">
             </div>
         </div>
 
-        <button class="btn-print" onclick="window.print()">🖨️ PDF / Imprimir</button>
+        <button class="btn-print" onclick="window.print()" style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;">🖨️ PDF</button>
     </div>
 
     <div id="calendar" class="calendar-grid"></div>
 
     <div id="dayModal" class="modal">
         <div class="modal-content">
-            <h3 id="modalDate" style="margin:0"></h3>
-            <textarea id="modalText" class="modal-textarea"></textarea>
-            <button class="btn-save" onclick="saveFromModal()">Guardar Cambios</button>
-            <button style="width:100%; margin-top:5px; background:none; border:none; color:gray; cursor:pointer;" onclick="closeModal()">Cancelar</button>
+            <h3 id="modalDate" style="margin:0; font-size: 1.1rem;"></h3>
+            <textarea id="modalText" class="modal-textarea" placeholder="Escribe tu nota aquí..."></textarea>
+            <button class="btn-save" onclick="saveFromModal()">Guardar</button>
+            <button style="width:100%; margin-top:8px; background:none; border:none; color:gray; cursor:pointer; font-size: 0.8rem;" onclick="closeModal()">Cerrar</button>
         </div>
     </div>
 
@@ -122,20 +119,17 @@
             else document.getElementById('btnRed').classList.add('active');
         }
 
-        function load() { return JSON.parse(localStorage.getItem('agenda2026') || '{}'); }
+        function load() { return JSON.parse(localStorage.getItem('agenda2026_v2') || '{}'); }
 
         function save(id, value, type) {
             const data = load();
             if (!data[id]) data[id] = {};
             data[id][type] = value;
-            localStorage.setItem('agenda2026', JSON.stringify(data));
+            localStorage.setItem('agenda2026_v2', JSON.stringify(data));
         }
 
         function handleDayClick(dayId, dateText) {
-            // Aplicar el color de la herramienta actual inmediatamente
             save(dayId, selectedToolColor, 'color');
-            
-            // Abrir modal para editar texto
             currentEditingDayId = dayId;
             const data = load();
             document.getElementById('modalDate').innerText = dateText;
@@ -146,7 +140,7 @@
         function handleSearch() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             document.querySelectorAll('.day').forEach(day => {
-                const text = day.querySelector('.day-preview').innerText.toLowerCase();
+                const text = (day.querySelector('.day-preview').innerText || "").toLowerCase();
                 if (query === "") day.classList.remove('fade', 'highlight');
                 else if (text.includes(query)) { day.classList.remove('fade'); day.classList.add('highlight'); }
                 else day.classList.add('fade');
@@ -194,11 +188,14 @@
                     dayDiv.style.backgroundColor = dayData.color || 'white';
                     dayDiv.onclick = () => handleDayClick(dayId, `${d} de ${monthName}`);
                     
+                    // El clima ahora está en el top-row junto al número
                     let weatherHtml = isToday ? `<span class="weather-tag">☀️ 18°C</span>` : '';
                     
                     dayDiv.innerHTML = `
-                        ${weatherHtml}
-                        <div class="day-number">${d}</div>
+                        <div class="day-top-row">
+                            <div class="day-number">${d}</div>
+                            ${weatherHtml}
+                        </div>
                         <div class="day-preview">${dayData.text || ''}</div>
                     `;
                     daysGrid.appendChild(dayDiv);
