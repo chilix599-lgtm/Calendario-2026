@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Inteligente</title>
+    <title>IAgenda</title>
     
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/lol.png">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/lol.png">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png">
     
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Agenda 26">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#b8860b">
 
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; padding: 20px; color: #333; margin: 0; }
-        h1 { text-align: center; margin-bottom: 10px; color: #b8860b; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        h1 { text-align: center; margin-bottom: 10px; color: #b8860b; }
         
         .controls { 
             position: sticky; top: 10px; background: white; padding: 15px; 
@@ -28,12 +28,11 @@
 
         .color-btn { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 3px solid #eee; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .color-btn.active { border-color: #b8860b; transform: scale(1.1); box-shadow: 0 0 8px rgba(184,134,11,0.4); }
-        .bg-red { background-color: #f8d7da; border-color: #f5c6cb; }
+        .bg-red { background-color: #f8d7da; }
         .bg-white { background-color: #ffffff; border: 3px solid #ddd; }
 
         .search-container { position: relative; display: flex; align-items: center; }
-        .search-input { padding: 8px 12px 8px 35px; border: 2px solid #ddd; border-radius: 20px; width: 180px; outline: none; transition: 0.3s; }
-        .search-input:focus { border-color: #b8860b; width: 220px; }
+        .search-input { padding: 8px 12px 8px 35px; border: 2px solid #ddd; border-radius: 20px; width: 180px; outline: none; }
         .search-icon { position: absolute; left: 12px; color: #999; }
 
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
@@ -55,9 +54,7 @@
             flex-direction: column; 
             overflow: hidden;
             background: white;
-            transition: 0.1s;
         }
-        .day:active { transform: scale(0.96); }
         .day.today { border: 2px solid #b8860b; background-color: #fffcf0 !important; }
         .day.highlight { border: 2px solid #b8860b; box-shadow: 0 0 8px rgba(184,134,11,0.4); }
         .day.fade { opacity: 0.15; }
@@ -66,19 +63,12 @@
         .day-number { font-size: 0.8rem; font-weight: bold; }
         .weather-tag { font-size: 0.65rem; color: #ff9800; font-weight: bold; }
         
-        .day-preview { 
-            font-size: 0.6rem; 
-            color: #444; 
-            overflow-y: auto; 
-            word-wrap: break-word;
-            flex-grow: 1;
-            scrollbar-width: none;
-        }
+        .day-preview { font-size: 0.6rem; color: #444; overflow-y: auto; flex-grow: 1; scrollbar-width: none; }
         .day-preview::-webkit-scrollbar { display: none; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; }
-        .modal-textarea { width: 100%; height: 150px; margin-top: 10px; padding: 12px; border-radius: 8px; border: 1px solid #ddd; resize: none; box-sizing: border-box; font-family: inherit; font-size: 1rem; }
+        .modal-textarea { width: 100%; height: 150px; margin-top: 10px; padding: 12px; border-radius: 8px; border: 1px solid #ddd; resize: none; box-sizing: border-box; font-family: inherit; }
         .btn-save { width: 100%; margin-top: 10px; padding: 12px; background: #b8860b; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
         @media print { .controls { display: none !important; } .day { height: auto; min-height: 80px; } }
@@ -90,9 +80,9 @@
 
     <div class="controls">
         <div class="tool-section">
-            <span style="font-size: 0.85rem; font-weight: bold;">Herramienta:</span>
-            <div id="btnWhite" class="color-btn bg-white active" onclick="setTool('white')" title="Limpiar Marcado">⚪</div>
-            <div id="btnRed" class="color-btn bg-red" onclick="setTool('#f8d7da')" title="Marcar Importante">🚩</div>
+            <span style="font-size: 0.85rem; font-weight: bold;">Modo:</span>
+            <div id="btnWhite" class="color-btn bg-white active" onclick="setTool('white')" title="Normal">⚪</div>
+            <div id="btnRed" class="color-btn bg-red" onclick="setTool('#f8d7da')" title="Importante">🚩</div>
         </div>
 
         <div class="tool-section">
@@ -110,8 +100,8 @@
     <div id="dayModal" class="modal">
         <div class="modal-content">
             <h3 id="modalDate" style="margin:0; font-size: 1.1rem; color: #b8860b;"></h3>
-            <textarea id="modalText" class="modal-textarea" placeholder="¿Qué hay para hoy?"></textarea>
-            <button class="btn-save" onclick="saveFromModal()">Guardar Cambios</button>
+            <textarea id="modalText" class="modal-textarea" placeholder="¿Qué tienes anotado?"></textarea>
+            <button class="btn-save" onclick="saveFromModal()">Guardar</button>
             <button style="width:100%; margin-top:8px; background:none; border:none; color:gray; cursor:pointer;" onclick="closeModal()">Cerrar</button>
         </div>
     </div>
@@ -177,7 +167,7 @@
                 const lastNotif = localStorage.getItem('last_notif_date');
                 const todayStr = new Date().toDateString();
                 if (lastNotif !== todayStr) {
-                    new Notification("Agenda: Mañana tienes tareas", { body: data[tomorrowId].text.substring(0, 60) + "..." });
+                    new Notification("Agenda: Recordatorio para mañana", { body: data[tomorrowId].text.substring(0, 60) + "..." });
                     localStorage.setItem('last_notif_date', todayStr);
                 }
             }
