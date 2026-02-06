@@ -11,7 +11,6 @@
         :root { --primary: #2563eb; --festivo: #e11d48; --bg: #f8fafc; --has-note: #ffedd5; --has-note-border: #fdba74; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; color: #1e293b; padding-bottom: 40px; }
         
-        /* Notificaciones */
         #notif-banner {
             display: none; background: #1e293b; color: white; padding: 15px;
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -30,17 +29,14 @@
         }
 
         .calendar-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-            gap: 20px; padding: 0 20px;
-            align-items: stretch; /* Estira los elementos para que midan lo mismo en la misma fila */
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+            gap: 20px; padding: 0 20px; align-items: stretch;
         }
 
         .month { 
             background: white; padding: 15px; border-radius: 16px; 
             border: 1px solid #e2e8f0; display: flex; flex-direction: column;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); 
-            min-height: 480px; /* Altura mínima para asegurar uniformidad en PC */
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); min-height: 480px;
         }
 
         .month-title { text-align: center; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; color: #475569; letter-spacing: 1px; }
@@ -78,10 +74,20 @@
 
         .search-input { padding: 8px 15px; border-radius: 20px; border: 1px solid #e2e8f0; width: 180px; outline: none; }
         .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 1px solid #ddd; }
+        
+        /* Modal Mejorado */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-        .modal-content { background: white; padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; }
-        textarea { width: 100%; height: 160px; margin-top: 10px; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: inherit; resize: none; box-sizing: border-box; }
-        .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 15px; }
+        .modal-content { background: white; padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        
+        .modal-header-info { text-align: center; margin-bottom: 15px; }
+        .modal-day-num { font-size: 3rem; font-weight: 900; line-height: 1; color: var(--primary); margin: 0; }
+        .modal-day-name { font-size: 1.2rem; font-weight: 700; text-transform: capitalize; color: #475569; margin: 5px 0; }
+        .modal-weather-info { font-size: 1.1rem; font-weight: 600; color: #64748b; margin-bottom: 5px; }
+        .modal-holiday-info { background: #fff1f2; color: var(--festivo); padding: 5px 12px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; display: inline-block; }
+
+        textarea { width: 100%; height: 140px; margin-top: 15px; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: inherit; resize: none; box-sizing: border-box; font-size: 1rem; }
+        .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: opacity 0.2s; }
+        .btn-save:active { opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -104,11 +110,13 @@
 
     <div id="dayModal" class="modal">
         <div class="modal-content">
-            <div style="text-align:center; border-bottom:1px solid #eee; padding-bottom:10px;">
-                <h3 id="modalDate" style="margin:0; text-transform:capitalize;"></h3>
-                <div id="modalHoliday" style="color:var(--festivo); font-weight:bold; font-size:0.8rem; margin-top:5px;"></div>
+            <div class="modal-header-info">
+                <p id="modalDayNum" class="modal-day-num"></p>
+                <p id="modalDayText" class="modal-day-name"></p>
+                <div id="modalWeather" class="modal-weather-info"></div>
+                <div id="modalHoliday" class="modal-holiday-info" style="display:none;"></div>
             </div>
-            <textarea id="modalText" placeholder="Añade una nota..."></textarea>
+            <textarea id="modalText" placeholder="Escribe tus tareas aquí..."></textarea>
             <button class="btn-save" onclick="saveData()">Guardar Cambios</button>
         </div>
     </div>
@@ -121,8 +129,9 @@
         const yearActual = 2026;
 
         const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
-        const dayNames = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"];
-        const holidays = { "1-0": "Año Nuevo", "6-0": "Reyes", "19-2": "San José/Padre", "7-3": "Bando Huerta", "1-4": "Trabajo", "3-4": "Madre", "9-5": "Murcia", "24-5": "San Juan", "15-7": "Asunción", "31-7": "San Ramón", "12-9": "Fiesta Nac.", "1-10": "T. Santos", "6-11": "Constitución", "8-11": "Inmaculada", "25-11": "Navidad" };
+        const dayNamesLong = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+        const dayNamesShort = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"];
+        const holidays = { "1-0": "Año Nuevo", "6-0": "Reyes", "19-2": "San José", "7-3": "Bando de la Huerta", "1-4": "Día del Trabajo", "3-4": "Día de la Madre", "9-5": "Día de la Región de Murcia", "24-5": "San Juan", "15-7": "Asunción de la Virgen", "31-7": "San Ramón", "12-9": "Fiesta Nacional", "1-10": "Todos los Santos", "6-11": "Constitución", "8-11": "Inmaculada", "25-11": "Navidad" };
 
         async function requestNotificationPermission() {
             const permission = await Notification.requestPermission();
@@ -137,9 +146,7 @@
             if (localStorage.getItem('notif_enabled') !== 'true') return;
             setInterval(() => {
                 const hNow = new Date();
-                if (hNow.getHours() === 19 && hNow.getMinutes() === 0) {
-                    sendReminder();
-                }
+                if (hNow.getHours() === 19 && hNow.getMinutes() === 0) sendReminder();
             }, 60000); 
         }
 
@@ -148,25 +155,16 @@
             tomorrow.setDate(tomorrow.getDate() + 1);
             const id = `${tomorrow.getFullYear()}-${tomorrow.getMonth()}-${tomorrow.getDate()}`;
             const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v8') || '{}');
-            const entry = storage[id];
-
-            if (entry && entry.text && entry.text.trim() !== "") {
-                new Notification("Tarea para mañana", {
-                    body: `Mañana: ${entry.text}`,
-                    icon: "https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png"
-                });
+            if (storage[id]?.text?.trim()) {
+                new Notification("Tarea para mañana", { body: `Mañana: ${storage[id].text}` });
             }
-        }
-
-        if (!localStorage.getItem('notif_enabled') && Notification.permission !== "granted") {
-            document.getElementById('notif-banner').style.display = 'flex';
         }
 
         async function fetchWeather() {
             try {
                 const resp = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.98&longitude=-1.13&current_weather=true');
                 const data = await resp.json();
-                weatherData.temp = Math.round(data.current_weather.temperature) + "°";
+                weatherData.temp = Math.round(data.current_weather.temperature) + "°C";
                 weatherData.icon = (code => {
                     if (code === 0) return "☀️"; if (code <= 3) return "☁️"; if (code <= 67) return "🌧️"; return "🌩️";
                 })(data.current_weather.weathercode);
@@ -183,11 +181,10 @@
 
             months.forEach((mName, mIdx) => {
                 if (mIdx < currentMonth) return;
-                
                 const mDiv = document.createElement('div'); mDiv.className = 'month';
                 mDiv.innerHTML = `<div class="month-title">${mName} ${yearActual}</div>`;
                 const grid = document.createElement('div'); grid.className = 'days-grid';
-                dayNames.forEach(h => grid.innerHTML += `<div class="day-header">${h}</div>`);
+                dayNamesShort.forEach(h => grid.innerHTML += `<div class="day-header">${h}</div>`);
 
                 let firstDay = new Date(yearActual, mIdx, 1).getDay();
                 firstDay = (firstDay === 0) ? 6 : firstDay - 1; 
@@ -205,10 +202,7 @@
                     const dDiv = document.createElement('div');
                     dDiv.className = `day ${fest ? 'holiday' : ''} ${isToday ? 'today' : ''} ${hasText ? 'has-content' : ''}`;
                     dDiv.style.backgroundColor = hasText ? 'var(--has-note)' : (entry.color || 'white');
-                    
-                    if (query && !(entry.text && entry.text.toLowerCase().includes(query))) {
-                        dDiv.style.opacity = "0.15";
-                    }
+                    if (query && !(entry.text && entry.text.toLowerCase().includes(query))) dDiv.style.opacity = "0.15";
 
                     dDiv.innerHTML = `
                         <div class="day-header-row">
@@ -228,8 +222,24 @@
         function openModal(id, d, mName, mIdx, fest) {
             currentDayId = id;
             const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v8') || '{}');
-            document.getElementById('modalDate').innerText = `${d} de ${mName}`;
-            document.getElementById('modalHoliday').innerText = fest ? `🎉 ${fest}` : "";
+            const dateObj = new Date(yearActual, mIdx, d);
+            const dayNameText = dayNamesLong[dateObj.getDay()];
+
+            document.getElementById('modalDayNum').innerText = d;
+            document.getElementById('modalDayText').innerText = `${dayNameText}, ${mName}`;
+            
+            // Solo mostramos el clima si es HOY (para mayor realismo de la API)
+            const isToday = (mIdx === now.getMonth() && d === now.getDate());
+            document.getElementById('modalWeather').innerText = isToday ? `${weatherData.icon} ${weatherData.temp}` : "🌡️ --";
+            
+            const holDiv = document.getElementById('modalHoliday');
+            if (fest) {
+                holDiv.innerText = `🎉 ${fest}`;
+                holDiv.style.display = 'inline-block';
+            } else {
+                holDiv.style.display = 'none';
+            }
+
             document.getElementById('modalText').value = storage[id]?.text || "";
             document.getElementById('dayModal').style.display = 'flex';
         }
@@ -244,8 +254,10 @@
             renderCalendar();
         }
 
-        window.onclick = (e) => { 
-            if(e.target.className === 'modal') document.getElementById('dayModal').style.display = 'none'; 
+        window.onclick = (e) => { if(e.target.className === 'modal') document.getElementById('dayModal').style.display = 'none'; }
+        
+        if (!localStorage.getItem('notif_enabled') && Notification.permission !== "granted") {
+            document.getElementById('notif-banner').style.display = 'flex';
         }
 
         fetchWeather();
