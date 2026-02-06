@@ -1,0 +1,17 @@
+{
+  "name": "Calendario 2026 Inteligente",
+  "short_name": "Cal 2026",
+  "description": "Calendario personalizable con notas y colores",
+  "start_url": "Calendario.html",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#007bff",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3652/3652191.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
