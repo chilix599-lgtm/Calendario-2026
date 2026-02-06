@@ -3,76 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Inteligente Perpetua</title>
-    <link rel="apple-touch-icon" href="https://i.ibb.co/3ykXvK8/Gemini-Generated-Image-5i2wkz5i2wkz5i2w.png">
-    <link rel="icon" href="https://i.ibb.co/3ykXvK8/Gemini-Generated-Image-5i2wkz5i2wkz5i2w.png">
+    <title>Mi Agenda Inteligente</title>
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png">
     
     <style>
-        :root { --blue: #2563eb; --red: #e11d48; --slate: #64748b; --bg: #f8fafc; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; color: #1e293b; padding-bottom: 50px; }
+        :root { --primary: #2563eb; --festivo: #e11d48; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; color: #1e293b; padding-bottom: 40px; }
         
-        #notif-banner {
-            background: #1e293b; color: white; padding: 12px; text-align: center;
-            position: sticky; top: 0; z-index: 1001; display: none;
-        }
-        #notif-banner button {
-            background: var(--blue); color: white; border: none; padding: 6px 15px;
-            border-radius: 6px; cursor: pointer; margin-left: 10px; font-weight: bold;
-        }
-
         .header-controls { 
             background: white; padding: 15px; display: flex; 
             justify-content: center; gap: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px; align-items: center;
+            margin-bottom: 20px; align-items: center; position: sticky; top: 0; z-index: 100;
         }
 
-        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; padding: 20px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; padding: 0 20px; }
         .month { background: white; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; height: fit-content; }
-        .month-title { text-align: center; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; color: #475569; }
+        .month-title { text-align: center; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; color: #475569; letter-spacing: 1px; }
         
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .day-header { text-align: center; font-size: 0.7rem; color: #94a3b8; font-weight: bold; }
+        .day-header { text-align: center; font-size: 0.7rem; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
         
+        /* TAMAÑO DE DÍA BLOQUEADO */
         .day { 
-            border: 1px solid #f1f5f9; width: 100%; height: 90px; padding: 8px; 
+            border: 1px solid #f1f5f9; width: 100%; height: 95px; padding: 8px; 
             border-radius: 10px; cursor: pointer; position: relative; 
-            box-sizing: border-box; overflow: hidden; background: white;
+            box-sizing: border-box; overflow: hidden; background: white; transition: transform 0.1s;
         }
+        .day:active { transform: scale(0.95); }
         
-        .day-header-row { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin-bottom: 2px; }
+        .day-header-row { display: flex; align-items: center; justify-content: flex-start; gap: 10px; margin-bottom: 4px; }
         .day-number { font-size: 1.1rem; font-weight: 700; color: #334155; }
-        .weather-tag { font-size: 0.75rem; color: var(--blue); font-weight: bold; }
+        .weather-tag { font-size: 0.75rem; color: var(--primary); font-weight: 800; }
 
         .day.holiday { background-color: #fff1f2; border-color: #fecdd3; }
-        .holiday-label { font-size: 0.55rem; color: var(--red); font-weight: 700; display: block; line-height: 1; margin-bottom: 4px; }
+        .holiday-label { font-size: 0.55rem; color: var(--festivo); font-weight: 700; display: block; line-height: 1.1; margin-bottom: 4px; }
         
-        .day-preview { font-size: 0.65rem; color: var(--slate); line-height: 1.2; overflow: hidden; }
-        .today { border: 2px solid var(--blue) !important; background-color: #eff6ff; }
+        .day-preview { font-size: 0.65rem; color: #64748b; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .today { border: 2.5px solid var(--primary) !important; background-color: #eff6ff; }
 
+        /* BUSCADOR Y COLORES */
+        .search-input { padding: 10px 18px; border-radius: 20px; border: 1px solid #e2e8f0; width: 220px; outline: none; }
+        .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 1px solid #ddd; }
+
+        /* MODAL */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.7); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px);
         }
-        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; }
-        .modal-header-info { border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .modal-date-title { font-size: 1.3rem; font-weight: 800; text-transform: capitalize; margin: 0; }
-        textarea { width: 100%; height: 150px; margin-top: 15px; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; font-family: inherit; resize: none; box-sizing: border-box; }
-        .btn-save { width: 100%; padding: 14px; background: var(--blue); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .modal-content { background: white; padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); }
+        .modal-header-info { border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px; }
+        .modal-date-title { font-size: 1.4rem; font-weight: 800; text-transform: capitalize; margin: 0; color: #1e293b; }
+        textarea { width: 100%; height: 160px; margin-top: 5px; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: inherit; resize: none; box-sizing: border-box; font-size: 1rem; }
+        .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1rem; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div id="notif-banner">
-        📬 Activa avisos para recibir alertas de tus tareas a las 19:00h.
-        <button onclick="requestNotifs()">Activar ahora</button>
-    </div>
-
     <div class="header-controls">
-        <input type="text" id="searchInput" placeholder="Buscar nota..." oninput="renderCalendar()" style="padding:10px 20px; border-radius:30px; border:1px solid #e2e8f0; width:250px; outline: none;">
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar nota..." oninput="renderCalendar()">
         <div style="display:flex; gap:10px;">
-            <div onclick="selectedColor='white'" style="width:25px; height:25px; background:white; border:1px solid #ddd; border-radius:50%; cursor:pointer;"></div>
-            <div onclick="selectedColor='#dcfce7'" style="width:25px; height:25px; background:#dcfce7; border-radius:50%; cursor:pointer;"></div>
-            <div onclick="selectedColor='#fee2e2'" style="width:25px; height:25px; background:#fee2e2; border-radius:50%; cursor:pointer;"></div>
+            <div onclick="selectedColor='white'" class="color-dot" style="background:white;"></div>
+            <div onclick="selectedColor='#dcfce7'" class="color-dot" style="background:#dcfce7;"></div>
+            <div onclick="selectedColor='#fee2e2'" class="color-dot" style="background:#fee2e2;"></div>
         </div>
     </div>
 
@@ -82,11 +75,11 @@
         <div class="modal-content">
             <div class="modal-header-info">
                 <h3 id="modalDate" class="modal-date-title"></h3>
-                <div id="modalSub" style="color:var(--slate); font-size:0.9rem; margin-top:5px;"></div>
-                <div id="modalHoliday" style="color:var(--red); font-weight:bold; font-size:0.85rem; margin-top:5px;"></div>
+                <div id="modalSub" style="color:#64748b; font-size:0.95rem; margin-top:6px; font-weight: 500;"></div>
+                <div id="modalHoliday" style="color:var(--festivo); font-weight:bold; font-size:0.85rem; margin-top:6px;"></div>
             </div>
-            <textarea id="modalText" placeholder="Anotaciones para este día..."></textarea>
-            <button class="btn-save" onclick="saveData()">Guardar Cambios</button>
+            <textarea id="modalText" placeholder="¿Qué hay que hacer hoy?"></textarea>
+            <button class="btn-save" onclick="saveData()">Guardar Agenda</button>
         </div>
     </div>
 
@@ -95,12 +88,12 @@
         let currentDayId = null;
         let tempGlobal = "--";
         const now = new Date();
-        const yearActual = now.getFullYear(); // AÑO AUTOMÁTICO
+        const yearActual = now.getFullYear();
 
         const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
         const dayNamesLong = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
-        // Festivos (Día-Mes)
+        // Festivos Murcia & España (Día-Mes)
         const holidays = {
             "1-0": "Año Nuevo", "6-0": "Reyes Magos", "19-2": "San José (Murcia)", 
             "7-3": "Bando de la Huerta (Murcia)", "1-4": "Día del Trabajo",
@@ -113,33 +106,19 @@
             try {
                 const resp = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.98&longitude=-1.13&current_weather=true');
                 const data = await resp.json();
-                tempGlobal = Math.round(data.current_weather.temperature) + "°C";
+                tempGlobal = Math.round(data.current_weather.temperature) + "°";
                 renderCalendar(); 
-            } catch(e) {}
+            } catch(e) { console.log("Clima no disponible"); }
         }
+        
+        // Actualización cada 30 minutos
         setInterval(fetchWeather, 1800000); 
         fetchWeather();
-
-        function requestNotifs() {
-            Notification.requestPermission().then(p => {
-                if (p === "granted") document.getElementById('notif-banner').style.display = 'none';
-            });
-        }
-
-        setInterval(() => {
-            const time = new Date();
-            if (time.getHours() === 19 && time.getMinutes() === 0) {
-                const tom = new Date(); tom.setDate(time.getDate() + 1);
-                const id = `${tom.getFullYear()}-${tom.getMonth()}-${tom.getDate()}`;
-                const storage = JSON.parse(localStorage.getItem('agenda_perpetua') || '{}');
-                if (storage[id]?.text) new Notification("Recordatorio Mañana", { body: storage[id].text });
-            }
-        }, 60000);
 
         function renderCalendar() {
             const container = document.getElementById('calendar');
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const storage = JSON.parse(localStorage.getItem('agenda_perpetua') || '{}');
+            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v3') || '{}');
             const currentMonth = now.getMonth();
             const currentDay = now.getDate();
             
@@ -171,7 +150,8 @@
                     const dDiv = document.createElement('div');
                     dDiv.className = `day ${fest ? 'holiday' : ''} ${isToday ? 'today' : ''}`;
                     dDiv.style.backgroundColor = entry.color || 'white';
-                    if (query && !(entry.text && entry.text.toLowerCase().includes(query))) dDiv.style.opacity = "0.1";
+                    
+                    if (query && !(entry.text && entry.text.toLowerCase().includes(query))) dDiv.style.opacity = "0.15";
 
                     dDiv.innerHTML = `
                         <div class="day-header-row">
@@ -192,7 +172,7 @@
 
         function openModal(id, dayNum, monthName, mIdx, festivo) {
             currentDayId = id;
-            const storage = JSON.parse(localStorage.getItem('agenda_perpetua') || '{}');
+            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v3') || '{}');
             const dateObj = new Date(yearActual, mIdx, dayNum);
             const isToday = (now.getMonth() === mIdx && now.getDate() === dayNum);
 
@@ -204,16 +184,15 @@
         }
 
         function saveData() {
-            const storage = JSON.parse(localStorage.getItem('agenda_perpetua') || '{}');
+            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v3') || '{}');
             if(!storage[currentDayId]) storage[currentDayId] = {};
             storage[currentDayId].text = document.getElementById('modalText').value;
             storage[currentDayId].color = selectedColor;
-            localStorage.setItem('agenda_perpetua', JSON.stringify(storage));
+            localStorage.setItem('agenda_perpetua_v3', JSON.stringify(storage));
             document.getElementById('dayModal').style.display = 'none';
             renderCalendar();
         }
 
-        if (Notification.permission === "default") document.getElementById('notif-banner').style.display = 'block';
         window.onclick = (e) => { if(e.target.className === 'modal') document.getElementById('dayModal').style.display = 'none'; }
         renderCalendar();
     </script>
