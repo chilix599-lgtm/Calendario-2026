@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Murcia Inteligente</title>
+    <title>Agenda Murcia Inteligente - Simétrica</title>
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png">
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png">
     
@@ -17,105 +17,91 @@
             margin-bottom: 20px; align-items: center; position: sticky; top: 0; z-index: 100;
         }
 
+        /* Contenedor de meses - Ajustado para mayor ancho */
         .calendar-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); /* Más ancho */
             gap: 25px; 
             padding: 0 20px;
-            align-items: start;
         }
 
+        /* Meses con altura fija bloqueada */
         .month { 
             background: white; 
             padding: 20px; 
             border-radius: 16px; 
             border: 1px solid #e2e8f0; 
-            min-height: 550px; 
+            display: flex;
+            flex-direction: column;
+            height: 850px; /* Altura fija para que todos sean iguales */
         }
 
         .month-title { text-align: center; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; color: #475569; letter-spacing: 1px; }
-        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .day-header { text-align: center; font-size: 0.7rem; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
         
-        /* RECTÁNGULOS MÁS GRANDES Y FLEXIBLES */
+        .days-grid { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 8px; 
+            flex-grow: 1; /* Ocupa todo el espacio disponible */
+        }
+
+        .day-header { text-align: center; font-size: 0.75rem; color: #94a3b8; font-weight: bold; padding-bottom: 5px; }
+        
+        /* Días más anchos y con altura proporcional */
         .day { 
             border: 1px solid #f1f5f9; 
             width: 100%; 
-            height: 120px; /* Altura aumentada */
-            padding: 8px; 
+            height: 115px; 
+            padding: 10px; 
             border-radius: 12px; 
             cursor: pointer; 
-            position: relative; 
-            box-sizing: border-box; 
             background: white;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            overflow: hidden;
+            box-sizing: border-box;
+            transition: background 0.2s;
         }
-        
-        .day-header-row { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            margin-bottom: 4px;
-            flex-shrink: 0;
-        }
+
+        .day-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
         .day-number { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
-        .weather-tag { font-size: 0.85rem; font-weight: 800; color: var(--primary); white-space: nowrap; }
+        .weather-tag { font-size: 0.9rem; font-weight: 800; color: var(--primary); }
 
         .day.holiday { background-color: #fff1f2; border-color: #fecdd3; }
+        .day.empty { background-color: #fcfcfc; border: 1px dashed #eee; cursor: default; }
         
-        /* FESTIVOS SIN CORTAR */
         .holiday-label { 
             font-size: 0.65rem; 
             color: var(--festivo); 
             font-weight: 800; 
-            display: block; 
-            line-height: 1.1; 
-            margin-bottom: 4px;
             text-align: center; 
-            width: 100%;
             word-wrap: break-word;
-            overflow-wrap: break-word;
+            line-height: 1.1;
         }
         
-        /* VISTA PREVIA DE NOTA */
         .day-preview { 
             font-size: 0.7rem; 
             color: #64748b; 
-            line-height: 1.2; 
-            display: -webkit-box; 
-            -webkit-line-clamp: 3; /* Permite una línea más de texto */
-            -webkit-box-orient: vertical; 
             overflow: hidden; 
             text-align: center;
-            margin-top: auto; 
-            padding-top: 4px;
+            margin-top: auto;
         }
 
         .today { border: 3px solid var(--primary) !important; background-color: #eff6ff; }
 
+        /* Modal y Controles */
         .search-input { padding: 10px 18px; border-radius: 20px; border: 1px solid #e2e8f0; width: 220px; outline: none; }
-        .color-dot { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 1px solid #ddd; }
-
-        /* Estilo del Modal */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.7); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px);
-        }
+        .color-dot { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 1px solid #ddd; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
         .modal-content { background: white; padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; }
-        .modal-header-info { border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px; text-align: center; }
-        .modal-date-title { font-size: 1.4rem; font-weight: 800; text-transform: capitalize; margin: 0; }
-        textarea { width: 100%; height: 160px; margin-top: 5px; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: inherit; resize: none; box-sizing: border-box; font-size: 1rem; }
-        .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1rem; margin-top: 15px; }
+        textarea { width: 100%; height: 160px; margin-top: 10px; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: inherit; resize: none; box-sizing: border-box; }
+        .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
 
     <div class="header-controls">
         <input type="text" id="searchInput" class="search-input" placeholder="Buscar nota..." oninput="renderCalendar()">
-        <div style="display:flex; gap:12px;">
+        <div style="display:flex; gap:15px;">
             <div onclick="selectedColor='white'" class="color-dot" style="background:white;"></div>
             <div onclick="selectedColor='#dcfce7'" class="color-dot" style="background:#dcfce7;"></div>
             <div onclick="selectedColor='#fee2e2'" class="color-dot" style="background:#fee2e2;"></div>
@@ -126,13 +112,13 @@
 
     <div id="dayModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header-info">
-                <h3 id="modalDate" class="modal-date-title"></h3>
-                <div id="modalSub" style="color:#64748b; font-size:0.95rem; margin-top:6px; font-weight: 500;"></div>
-                <div id="modalHoliday" style="color:var(--festivo); font-weight:bold; font-size:0.85rem; margin-top:6px;"></div>
+            <div style="text-align:center; border-bottom:1px solid #eee; padding-bottom:10px;">
+                <h3 id="modalDate" style="margin:0; text-transform:capitalize;"></h3>
+                <div id="modalSub" style="color:#64748b; font-size:0.9rem; margin-top:5px;"></div>
+                <div id="modalHoliday" style="color:var(--festivo); font-weight:bold; font-size:0.8rem; margin-top:5px;"></div>
             </div>
-            <textarea id="modalText" placeholder="Notas para el día..."></textarea>
-            <button class="btn-save" onclick="saveData()">Guardar en Agenda</button>
+            <textarea id="modalText" placeholder="¿Qué tienes planeado?"></textarea>
+            <button class="btn-save" onclick="saveData()">Guardar Cambios</button>
         </div>
     </div>
 
@@ -144,25 +130,11 @@
         const yearActual = now.getFullYear();
 
         const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
-        const dayNamesLong = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-
-        const holidays = {
-            "1-0": "Año Nuevo", "6-0": "Reyes Magos", "19-2": "San José", 
-            "7-3": "Bando de la Huerta", "1-4": "Día del Trabajo",
-            "9-5": "Región de Murcia", "15-7": "Asunción", 
-            "12-9": "Fiesta Nacional", "1-10": "Todos los Santos",
-            "6-11": "Constitución", "8-11": "Inmaculada", "25-11": "Navidad"
-        };
+        const dayNames = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"];
+        const holidays = { "1-0": "Año Nuevo", "6-0": "Reyes", "19-2": "San José", "7-3": "Bando Huerta", "1-4": "Trabajo", "9-5": "Murcia", "15-7": "Asunción", "12-9": "Fiesta Nac.", "1-10": "T. Santos", "6-11": "Constitución", "8-11": "Inmaculada", "25-11": "Navidad" };
 
         function getWeatherIcon(code) {
-            if (code === 0) return "☀️";
-            if (code <= 3) return "☁️";
-            if (code <= 48) return "🌫️";
-            if (code <= 67) return "🌧️";
-            if (code <= 77) return "❄️";
-            if (code <= 82) return "🌦️";
-            if (code <= 99) return "🌩️";
-            return "🌡️";
+            if (code === 0) return "☀️"; if (code <= 3) return "☁️"; if (code <= 67) return "🌧️"; if (code <= 99) return "🌩️"; return "🌡️";
         }
 
         async function fetchWeather() {
@@ -174,16 +146,13 @@
                 renderCalendar(); 
             } catch(e) {}
         }
-        
-        setInterval(fetchWeather, 1800000); 
         fetchWeather();
 
         function renderCalendar() {
             const container = document.getElementById('calendar');
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v6') || '{}');
+            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v7') || '{}');
             const currentMonth = now.getMonth();
-            const currentDay = now.getDate();
             
             container.innerHTML = '';
 
@@ -196,24 +165,29 @@
                 
                 const grid = document.createElement('div');
                 grid.className = 'days-grid';
-                ["Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"].forEach(h => grid.innerHTML += `<div class="day-header">${h}</div>`);
+                dayNames.forEach(h => grid.innerHTML += `<div class="day-header">${h}</div>`);
 
-                let start = new Date(yearActual, mIdx, 1).getDay();
-                start = (start === 0) ? 6 : start - 1; 
-                const total = new Date(yearActual, mIdx + 1, 0).getDate();
+                let firstDay = new Date(yearActual, mIdx, 1).getDay();
+                firstDay = (firstDay === 0) ? 6 : firstDay - 1; 
+                const totalDays = new Date(yearActual, mIdx + 1, 0).getDate();
 
-                for(let i=0; i<start; i++) grid.innerHTML += '<div></div>';
+                // Llenar huecos iniciales
+                for(let i=0; i<firstDay; i++) {
+                    const empty = document.createElement('div');
+                    empty.className = 'day empty';
+                    grid.appendChild(empty);
+                }
 
-                for(let d=1; d<=total; d++) {
+                // Días reales
+                for(let d=1; d<=totalDays; d++) {
                     const id = `${yearActual}-${mIdx}-${d}`;
                     const fest = holidays[`${d}-${mIdx}`];
                     const entry = storage[id] || {};
-                    const isToday = (mIdx === currentMonth && d === currentDay);
+                    const isToday = (mIdx === currentMonth && d === now.getDate());
                     
                     const dDiv = document.createElement('div');
                     dDiv.className = `day ${fest ? 'holiday' : ''} ${isToday ? 'today' : ''}`;
                     dDiv.style.backgroundColor = entry.color || 'white';
-                    
                     if (query && !(entry.text && entry.text.toLowerCase().includes(query))) dDiv.style.opacity = "0.15";
 
                     dDiv.innerHTML = `
@@ -224,34 +198,40 @@
                         ${fest ? `<span class="holiday-label">${fest}</span>` : ''}
                         <div class="day-preview">${entry.text || ''}</div>
                     `;
-                    
                     dDiv.onclick = () => openModal(id, d, mName, mIdx, fest);
                     grid.appendChild(dDiv);
                 }
+
+                // RELLENO FINAL PARA QUE TODOS LOS MESES TENGAN 6 FILAS (42 espacios)
+                const totalCells = 42; 
+                const currentCells = firstDay + totalDays;
+                for(let i=currentCells; i<totalCells; i++) {
+                    const empty = document.createElement('div');
+                    empty.className = 'day empty';
+                    grid.appendChild(empty);
+                }
+
                 mDiv.appendChild(grid);
                 container.appendChild(mDiv);
             });
         }
 
-        function openModal(id, dayNum, monthName, mIdx, festivo) {
+        function openModal(id, d, mName, mIdx, fest) {
             currentDayId = id;
-            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v6') || '{}');
-            const dateObj = new Date(yearActual, mIdx, dayNum);
-            const isToday = (now.getMonth() === mIdx && now.getDate() === dayNum);
-
-            document.getElementById('modalDate').innerText = `${dayNum} de ${monthName}`;
-            document.getElementById('modalSub').innerHTML = `${dayNamesLong[dateObj.getDay()]} ${isToday ? ' | ' + weatherData.icon + ' ' + weatherData.temp : ''}`;
-            document.getElementById('modalHoliday').innerText = festivo ? `🎉 ${festivo}` : "";
+            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v7') || '{}');
+            document.getElementById('modalDate').innerText = `${d} de ${mName}`;
+            document.getElementById('modalSub').innerText = yearActual;
+            document.getElementById('modalHoliday').innerText = fest ? `🎉 ${fest}` : "";
             document.getElementById('modalText').value = storage[id]?.text || "";
             document.getElementById('dayModal').style.display = 'flex';
         }
 
         function saveData() {
-            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v6') || '{}');
+            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v7') || '{}');
             if(!storage[currentDayId]) storage[currentDayId] = {};
             storage[currentDayId].text = document.getElementById('modalText').value;
             storage[currentDayId].color = selectedColor;
-            localStorage.setItem('agenda_perpetua_v6', JSON.stringify(storage));
+            localStorage.setItem('agenda_perpetua_v7', JSON.stringify(storage));
             document.getElementById('dayModal').style.display = 'none';
             renderCalendar();
         }
