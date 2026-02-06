@@ -17,13 +17,12 @@
             margin-bottom: 20px; align-items: center; position: sticky; top: 0; z-index: 100;
         }
 
-        /* Alineación de meses */
         .calendar-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
             gap: 25px; 
             padding: 0 20px;
-            align-items: start; /* Mantiene todos los meses alineados arriba */
+            align-items: start;
         }
 
         .month { 
@@ -31,45 +30,76 @@
             padding: 20px; 
             border-radius: 16px; 
             border: 1px solid #e2e8f0; 
-            min-height: 480px; /* Altura mínima uniforme */
+            min-height: 550px; 
         }
 
         .month-title { text-align: center; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; color: #475569; letter-spacing: 1px; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .day-header { text-align: center; font-size: 0.7rem; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
         
-        /* Días con tamaño fijo */
+        /* RECTÁNGULOS MÁS GRANDES Y FLEXIBLES */
         .day { 
-            border: 1px solid #f1f5f9; width: 100%; height: 95px; padding: 8px; 
-            border-radius: 10px; cursor: pointer; position: relative; 
-            box-sizing: border-box; overflow: hidden; background: white;
+            border: 1px solid #f1f5f9; 
+            width: 100%; 
+            height: 120px; /* Altura aumentada */
+            padding: 8px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            position: relative; 
+            box-sizing: border-box; 
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow: hidden;
         }
         
-        .day-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-        .day-number { font-size: 1.1rem; font-weight: 700; color: #334155; }
-        .weather-tag { font-size: 0.85rem; font-weight: 800; color: var(--primary); }
+        .day-header-row { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+        .day-number { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
+        .weather-tag { font-size: 0.85rem; font-weight: 800; color: var(--primary); white-space: nowrap; }
 
         .day.holiday { background-color: #fff1f2; border-color: #fecdd3; }
         
-        /* Festivos centrados */
+        /* FESTIVOS SIN CORTAR */
         .holiday-label { 
-            font-size: 0.55rem; 
+            font-size: 0.65rem; 
             color: var(--festivo); 
-            font-weight: 700; 
+            font-weight: 800; 
             display: block; 
             line-height: 1.1; 
             margin-bottom: 4px;
             text-align: center; 
             width: 100%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         
-        .day-preview { font-size: 0.65rem; color: #64748b; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-align: center; }
-        .today { border: 2.5px solid var(--primary) !important; background-color: #eff6ff; }
+        /* VISTA PREVIA DE NOTA */
+        .day-preview { 
+            font-size: 0.7rem; 
+            color: #64748b; 
+            line-height: 1.2; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; /* Permite una línea más de texto */
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            text-align: center;
+            margin-top: auto; 
+            padding-top: 4px;
+        }
+
+        .today { border: 3px solid var(--primary) !important; background-color: #eff6ff; }
 
         .search-input { padding: 10px 18px; border-radius: 20px; border: 1px solid #e2e8f0; width: 220px; outline: none; }
-        .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 1px solid #ddd; }
+        .color-dot { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 1px solid #ddd; }
 
-        /* Modal */
+        /* Estilo del Modal */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.7); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px);
@@ -85,7 +115,7 @@
 
     <div class="header-controls">
         <input type="text" id="searchInput" class="search-input" placeholder="Buscar nota..." oninput="renderCalendar()">
-        <div style="display:flex; gap:10px;">
+        <div style="display:flex; gap:12px;">
             <div onclick="selectedColor='white'" class="color-dot" style="background:white;"></div>
             <div onclick="selectedColor='#dcfce7'" class="color-dot" style="background:#dcfce7;"></div>
             <div onclick="selectedColor='#fee2e2'" class="color-dot" style="background:#fee2e2;"></div>
@@ -101,8 +131,8 @@
                 <div id="modalSub" style="color:#64748b; font-size:0.95rem; margin-top:6px; font-weight: 500;"></div>
                 <div id="modalHoliday" style="color:var(--festivo); font-weight:bold; font-size:0.85rem; margin-top:6px;"></div>
             </div>
-            <textarea id="modalText" placeholder="Escribe tus notas aquí..."></textarea>
-            <button class="btn-save" onclick="saveData()">Guardar Cambios</button>
+            <textarea id="modalText" placeholder="Notas para el día..."></textarea>
+            <button class="btn-save" onclick="saveData()">Guardar en Agenda</button>
         </div>
     </div>
 
@@ -124,7 +154,6 @@
             "6-11": "Constitución", "8-11": "Inmaculada", "25-11": "Navidad"
         };
 
-        // Función para obtener icono según el código de clima (WMO)
         function getWeatherIcon(code) {
             if (code === 0) return "☀️";
             if (code <= 3) return "☁️";
@@ -152,7 +181,7 @@
         function renderCalendar() {
             const container = document.getElementById('calendar');
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v4') || '{}');
+            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v6') || '{}');
             const currentMonth = now.getMonth();
             const currentDay = now.getDate();
             
@@ -206,7 +235,7 @@
 
         function openModal(id, dayNum, monthName, mIdx, festivo) {
             currentDayId = id;
-            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v4') || '{}');
+            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v6') || '{}');
             const dateObj = new Date(yearActual, mIdx, dayNum);
             const isToday = (now.getMonth() === mIdx && now.getDate() === dayNum);
 
@@ -218,11 +247,11 @@
         }
 
         function saveData() {
-            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v4') || '{}');
+            const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v6') || '{}');
             if(!storage[currentDayId]) storage[currentDayId] = {};
             storage[currentDayId].text = document.getElementById('modalText').value;
             storage[currentDayId].color = selectedColor;
-            localStorage.setItem('agenda_perpetua_v4', JSON.stringify(storage));
+            localStorage.setItem('agenda_perpetua_v6', JSON.stringify(storage));
             document.getElementById('dayModal').style.display = 'none';
             renderCalendar();
         }
