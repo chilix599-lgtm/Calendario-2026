@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda 26 - Inteligente</title>
+    <title>Agenda Inteligente</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
-        h1 { text-align: center; margin-bottom: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; color: #333; margin: 0; }
+        h1 { text-align: center; margin-bottom: 10px; color: #1a73e8; }
         
         .controls { 
             position: sticky; top: 10px; background: white; padding: 15px; 
@@ -31,86 +31,95 @@
         .month { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         
         .month-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
-        .month-title { text-transform: capitalize; font-weight: bold; }
+        .month-title { text-transform: capitalize; font-weight: bold; color: #444; }
         
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
         .day-header { font-size: 0.7rem; text-align: center; color: #bbb; font-weight: 600; padding-bottom: 5px; }
         
-        /* Celdas con tamaño fijo y scroll */
         .day { 
             border: 1px solid #f0f0f0; 
-            height: 80px; /* Altura fija para no deformar */
+            height: 85px; 
             padding: 5px; 
             cursor: pointer; 
             border-radius: 4px; 
             display: flex; 
             flex-direction: column; 
-            overflow: hidden; /* Evita que el contenido se salga */
+            overflow: hidden;
+            background: white;
         }
-        .day.today { border: 2px solid #007bff; background-color: #f0f7ff; }
-        .day.fade { opacity: 0.15; }
+        .day.today { border: 2px solid #007bff; background-color: #f0f7ff !important; }
         .day.highlight { border: 2px solid #007bff; box-shadow: 0 0 8px rgba(0,123,255,0.4); }
+        .day.fade { opacity: 0.15; }
 
         .day-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
         .day-number { font-size: 0.8rem; font-weight: bold; }
-        .weather-tag { font-size: 0.65rem; color: #666; }
+        .weather-tag { font-size: 0.65rem; color: #ff9800; font-weight: bold; }
         
-        /* Contenedor de nota con scroll interno */
         .day-preview { 
             font-size: 0.6rem; 
             color: #444; 
-            overflow-y: auto; /* Scroll si el texto es largo */
+            overflow-y: auto; 
             word-wrap: break-word;
             flex-grow: 1;
-            scrollbar-width: thin; /* Para navegadores modernos */
+            scrollbar-width: none;
         }
+        .day-preview::-webkit-scrollbar { display: none; }
 
         /* Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; }
-        .modal-textarea { width: 100%; height: 150px; margin-top: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; resize: none; box-sizing: border-box; }
-        .btn-save { width: 100%; margin-top: 10px; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-textarea { width: 100%; height: 150px; margin-top: 10px; padding: 12px; border-radius: 8px; border: 1px solid #ddd; resize: none; box-sizing: border-box; font-family: inherit; }
+        .btn-save { width: 100%; margin-top: 10px; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-save:hover { background: #0056b3; }
 
-        @media print { .controls { display: none !important; } .day { height: auto; min-height: 60px; } }
+        @media print { .controls { display: none !important; } .day { height: auto; min-height: 80px; } }
     </style>
 </head>
 <body>
 
-    <h1>📅 Agenda 26</h1>
+    <h1 id="mainTitle">Agenda 2026</h1>
 
     <div class="controls">
         <div class="tool-section">
-            <span style="font-size: 0.85rem; font-weight: bold;">Color:</span>
-            <div id="btnWhite" class="color-btn bg-white active" onclick="setTool('white')" title="Normal / Despintar">⚪</div>
-            <div id="btnRed" class="color-btn bg-red" onclick="setTool('#f8d7da')" title="Importante">🚩</div>
+            <span style="font-size: 0.85rem; font-weight: bold;">Herramienta:</span>
+            <div id="btnWhite" class="color-btn bg-white active" onclick="setTool('white')" title="Normal / Borrar Rojo">⚪</div>
+            <div id="btnRed" class="color-btn bg-red" onclick="setTool('#f8d7da')" title="Marcar Importante">🚩</div>
         </div>
 
         <div class="tool-section">
             <div class="search-container">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" class="search-input" placeholder="Buscar..." oninput="handleSearch()">
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar en notas..." oninput="handleSearch()">
             </div>
         </div>
 
-        <button class="btn-print" onclick="window.print()" style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;">🖨️ PDF</button>
+        <button onclick="window.print()" style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;">🖨️ PDF</button>
     </div>
 
     <div id="calendar" class="calendar-grid"></div>
 
     <div id="dayModal" class="modal">
         <div class="modal-content">
-            <h3 id="modalDate" style="margin:0; font-size: 1.1rem;"></h3>
-            <textarea id="modalText" class="modal-textarea" placeholder="Escribe tu nota aquí..."></textarea>
-            <button class="btn-save" onclick="saveFromModal()">Guardar</button>
-            <button style="width:100%; margin-top:8px; background:none; border:none; color:gray; cursor:pointer; font-size: 0.8rem;" onclick="closeModal()">Cerrar</button>
+            <h3 id="modalDate" style="margin:0; font-size: 1.1rem; color: #1a73e8;"></h3>
+            <textarea id="modalText" class="modal-textarea" placeholder="¿Qué tienes que hacer hoy?"></textarea>
+            <button class="btn-save" onclick="saveFromModal()">Guardar en Agenda</button>
+            <button style="width:100%; margin-top:8px; background:none; border:none; color:gray; cursor:pointer; font-size: 0.8rem;" onclick="closeModal()">Cancelar</button>
         </div>
     </div>
 
     <script>
+        const currentYear = new Date().getFullYear();
+        document.getElementById('mainTitle').innerText = `Agenda ${currentYear}`;
+
         let selectedToolColor = 'white';
         let currentEditingDayId = null;
         const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
         const dayNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+        // Solicitar permisos de notificación
+        if ("Notification" in window) {
+            Notification.requestPermission();
+        }
 
         function setTool(color) {
             selectedToolColor = color;
@@ -119,13 +128,14 @@
             else document.getElementById('btnRed').classList.add('active');
         }
 
-        function load() { return JSON.parse(localStorage.getItem('agenda2026_v2') || '{}'); }
+        function load() { return JSON.parse(localStorage.getItem(`agenda_${currentYear}`) || '{}'); }
 
         function save(id, value, type) {
             const data = load();
             if (!data[id]) data[id] = {};
             data[id][type] = value;
-            localStorage.setItem('agenda2026_v2', JSON.stringify(data));
+            localStorage.setItem(`agenda_${currentYear}`, JSON.stringify(data));
+            checkNotifications(); 
         }
 
         function handleDayClick(dayId, dateText) {
@@ -157,38 +167,59 @@
             closeModal();
         }
 
+        function checkNotifications() {
+            if (Notification.permission !== "granted") return;
+
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowId = `${tomorrow.getMonth()}-${tomorrow.getDate()}`;
+            const data = load();
+
+            if (data[tomorrowId] && data[tomorrowId].text && data[tomorrowId].text.trim() !== "") {
+                // Solo notificar si no se ha notificado hoy ya para esa tarea
+                const lastNotif = localStorage.getItem('last_notif_date');
+                const todayStr = new Date().toDateString();
+
+                if (lastNotif !== todayStr) {
+                    new Notification("Recordatorio Agenda", {
+                        body: `Mañana tienes: ${data[tomorrowId].text.substring(0, 50)}...`,
+                        icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
+                    });
+                    localStorage.setItem('last_notif_date', todayStr);
+                }
+            }
+        }
+
         function renderCalendar() {
             const container = document.getElementById('calendar');
             container.innerHTML = '';
             const savedData = load();
             const today = new Date();
-            const isYear2026 = today.getFullYear() === 2026;
 
             months.forEach((monthName, monthIndex) => {
                 const monthDiv = document.createElement('div');
                 monthDiv.className = 'month';
-                monthDiv.innerHTML = `<div class="month-header"><div class="month-title">${monthName}</div></div>`;
+                monthDiv.innerHTML = `<div class="month-header"><div class="month-title">${monthName} ${currentYear}</div></div>`;
                 
                 const daysGrid = document.createElement('div');
                 daysGrid.className = 'days-grid';
                 dayNames.forEach(d => daysGrid.innerHTML += `<div class="day-header">${d}</div>`);
 
-                const firstDay = new Date(2026, monthIndex, 1).getDay();
-                const daysInMonth = new Date(2026, monthIndex + 1, 0).getDate();
+                const firstDay = new Date(currentYear, monthIndex, 1).getDay();
+                const daysInMonth = new Date(currentYear, monthIndex + 1, 0).getDate();
 
                 for (let i = 0; i < firstDay; i++) daysGrid.innerHTML += `<div></div>`;
 
                 for (let d = 1; d <= daysInMonth; d++) {
                     const dayId = `${monthIndex}-${d}`;
                     const dayData = savedData[dayId] || {};
-                    const isToday = isYear2026 && today.getMonth() === monthIndex && today.getDate() === d;
+                    const isToday = today.getFullYear() === currentYear && today.getMonth() === monthIndex && today.getDate() === d;
                     
                     const dayDiv = document.createElement('div');
                     dayDiv.className = `day ${isToday ? 'today' : ''}`;
                     dayDiv.style.backgroundColor = dayData.color || 'white';
                     dayDiv.onclick = () => handleDayClick(dayId, `${d} de ${monthName}`);
                     
-                    // El clima ahora está en el top-row junto al número
                     let weatherHtml = isToday ? `<span class="weather-tag">☀️ 18°C</span>` : '';
                     
                     dayDiv.innerHTML = `
@@ -207,7 +238,10 @@
         }
 
         window.onclick = (e) => { if (e.target.id == 'dayModal') closeModal(); }
+        
+        // Ejecutar al cargar
         renderCalendar();
+        setTimeout(checkNotifications, 2000); // Revisar notificaciones al abrir la app
     </script>
 </body>
 </html>
