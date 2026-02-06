@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario 2026 Inteligente con Buscador</title>
+    <title>Calendario 2026 Inteligente - Edición Varita</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
         h1 { text-align: center; margin-bottom: 20px; }
@@ -52,29 +52,20 @@
         .day { 
             border: 1px solid #f0f0f0; min-height: 55px; padding: 6px; 
             cursor: pointer; border-radius: 6px; transition: 0.2s;
-            display: flex; flex-direction: column; opacity: 1;
-            position: relative;
+            display: flex; flex-direction: column; position: relative;
         }
-
-        /* ESTILO DÍA ACTUAL */
-        .day.today { 
-            border: 2px solid #0056b3 !important; 
-            background-color: #e7f1ff !important;
-            transform: scale(1.02);
-            z-index: 1;
-        }
+        .day.fade { opacity: 0.2; transform: scale(0.95); }
+        
+        /* Estilo para el día actual con la Varita */
+        .day.today { border: 2px solid #555; background-color: #fdfdfd !important; }
         .day.today::after {
-            content: "HOY";
+            content: '🪄'; /* Icono de varita */
             position: absolute;
             top: 2px;
-            right: 4px;
-            font-size: 0.5rem;
-            font-weight: bold;
-            color: #0056b3;
+            right: 2px;
+            font-size: 1.2rem;
+            transform: rotate(-45deg);
         }
-
-        .day.fade { opacity: 0.2; transform: scale(0.95); }
-        .day.highlight { border: 2px solid #007bff; box-shadow: 0 0 10px rgba(0,123,255,0.3); }
 
         .day-number { font-size: 0.85rem; font-weight: bold; }
         .day-preview { font-size: 0.65rem; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -177,15 +168,13 @@
                 monthDays.forEach(day => {
                     const text = day.querySelector('.day-preview').innerText.toLowerCase();
                     if (query === "") {
-                        day.classList.remove('fade', 'highlight');
+                        day.classList.remove('fade');
                         monthHasMatch = true;
                     } else if (text.includes(query)) {
                         day.classList.remove('fade');
-                        day.classList.add('highlight');
                         monthHasMatch = true;
                     } else {
                         day.classList.add('fade');
-                        day.classList.remove('highlight');
                     }
                 });
 
@@ -218,12 +207,12 @@
             const container = document.getElementById('calendar');
             container.innerHTML = '';
             const savedData = load();
-
-            // Obtener fecha actual para comparar
+            
+            // Obtener fecha actual para marcar "hoy"
             const today = new Date();
-            const tDay = today.getDate();
-            const tMonth = today.getMonth();
-            const tYear = today.getFullYear();
+            const currentDay = today.getDate();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
 
             months.forEach((monthName, monthIndex) => {
                 const monthDiv = document.createElement('div');
@@ -244,13 +233,10 @@
                     const dayData = savedData[dayId] || {};
                     const dayDiv = document.createElement('div');
                     
-                    // Lógica para marcar "HOY"
-                    let classNames = 'day';
-                    if (tYear === 2026 && tMonth === monthIndex && tDay === d) {
-                        classNames += ' today';
-                    }
+                    // Comprobar si es "Hoy" (solo marcará si el sistema está en 2026)
+                    const isToday = (currentYear === 2026 && monthIndex === currentMonth && d === currentDay);
                     
-                    dayDiv.className = classNames;
+                    dayDiv.className = `day ${isToday ? 'today' : ''}`;
                     dayDiv.style.backgroundColor = dayData.color || 'white';
                     dayDiv.onclick = () => openModal(dayId, `${d} de ${monthName}`);
                     dayDiv.innerHTML = `<div class="day-number">${d}</div><div class="day-preview">${dayData.text || ''}</div>`;
