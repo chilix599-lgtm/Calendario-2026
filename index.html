@@ -1,12 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    
-    <link rel="icon" type="image/png" href="lol.png">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario 2026</title>
+    <title>Calendario 2026 Inteligente con Buscador</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
         h1 { text-align: center; margin-bottom: 20px; }
@@ -43,7 +40,7 @@
             gap: 25px; 
         }
         .month { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.3s; }
-        .month.hidden { display: none; } /* Ocultar meses sin resultados */
+        .month.hidden { display: none; } 
         
         .month-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #f0f0f0; padding-bottom: 5px; }
         .month-title { text-transform: capitalize; font-weight: bold; font-size: 1.1rem; }
@@ -56,8 +53,27 @@
             border: 1px solid #f0f0f0; min-height: 55px; padding: 6px; 
             cursor: pointer; border-radius: 6px; transition: 0.2s;
             display: flex; flex-direction: column; opacity: 1;
+            position: relative;
         }
-        .day.fade { opacity: 0.2; transform: scale(0.95); } /* Para días que no coinciden con la búsqueda */
+
+        /* ESTILO DÍA ACTUAL */
+        .day.today { 
+            border: 2px solid #0056b3 !important; 
+            background-color: #e7f1ff !important;
+            transform: scale(1.02);
+            z-index: 1;
+        }
+        .day.today::after {
+            content: "HOY";
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            font-size: 0.5rem;
+            font-weight: bold;
+            color: #0056b3;
+        }
+
+        .day.fade { opacity: 0.2; transform: scale(0.95); }
         .day.highlight { border: 2px solid #007bff; box-shadow: 0 0 10px rgba(0,123,255,0.3); }
 
         .day-number { font-size: 0.85rem; font-weight: bold; }
@@ -152,7 +168,6 @@
 
         function handleSearch() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const days = document.querySelectorAll('.day');
             const monthDivs = document.querySelectorAll('.month');
 
             monthDivs.forEach(month => {
@@ -174,7 +189,6 @@
                     }
                 });
 
-                // Ocultar meses que no tienen ninguna coincidencia para limpiar la vista
                 if (monthHasMatch) month.classList.remove('hidden');
                 else month.classList.add('hidden');
             });
@@ -192,7 +206,7 @@
         function closeModal() {
             document.getElementById('dayModal').style.display = 'none';
             renderCalendar();
-            handleSearch(); // Re-aplicar búsqueda si existía
+            handleSearch();
         }
 
         function saveFromModal() {
@@ -204,6 +218,12 @@
             const container = document.getElementById('calendar');
             container.innerHTML = '';
             const savedData = load();
+
+            // Obtener fecha actual para comparar
+            const today = new Date();
+            const tDay = today.getDate();
+            const tMonth = today.getMonth();
+            const tYear = today.getFullYear();
 
             months.forEach((monthName, monthIndex) => {
                 const monthDiv = document.createElement('div');
@@ -223,7 +243,14 @@
                     const dayId = `${monthIndex}-${d}`;
                     const dayData = savedData[dayId] || {};
                     const dayDiv = document.createElement('div');
-                    dayDiv.className = 'day';
+                    
+                    // Lógica para marcar "HOY"
+                    let classNames = 'day';
+                    if (tYear === 2026 && tMonth === monthIndex && tDay === d) {
+                        classNames += ' today';
+                    }
+                    
+                    dayDiv.className = classNames;
                     dayDiv.style.backgroundColor = dayData.color || 'white';
                     dayDiv.onclick = () => openModal(dayId, `${d} de ${monthName}`);
                     dayDiv.innerHTML = `<div class="day-number">${d}</div><div class="day-preview">${dayData.text || ''}</div>`;
@@ -238,9 +265,4 @@
         renderCalendar();
     </script>
 </body>
-
 </html>
-
-
-
-
