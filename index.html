@@ -95,28 +95,23 @@
     </div>
 
     <script>
-        const currentYear = new Date().getFullYear();
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth(); // 0-11
+        
         document.getElementById('mainTitle').innerText = `Agenda ${currentYear}`;
+        
         let selectedToolColor = 'white';
         let currentEditingDayId = null;
         const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
         const dayNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
-        // Festivos de España (Nacionales + Región de Murcia) para 2026
+        // Festivos de España/Murcia 2026
         const holidays2026 = {
-            "0-1": "Año Nuevo",
-            "0-6": "Reyes Magos",
-            "2-19": "San José",
-            "3-2": "Jueves Santo",
-            "3-3": "Viernes Santo",
-            "4-1": "Día del Trabajo",
-            "5-9": "Día Región de Murcia",
-            "7-15": "Asunción",
-            "9-12": "Fiesta Nacional",
-            "10-1": "Todos los Santos",
-            "11-6": "Constitución",
-            "11-8": "Inmaculada",
-            "11-25": "Navidad"
+            "0-1": "Año Nuevo", "0-6": "Reyes Magos", "2-19": "San José",
+            "3-2": "Jueves Santo", "3-3": "Viernes Santo", "4-1": "Día del Trabajo",
+            "5-9": "Día Región de Murcia", "7-15": "Asunción", "9-12": "Fiesta Nacional",
+            "10-1": "Todos los Santos", "11-6": "Constitución", "11-8": "Inmaculada", "11-25": "Navidad"
         };
 
         function setTool(color) {
@@ -139,9 +134,11 @@
             const container = document.getElementById('calendar');
             container.innerHTML = '';
             const savedData = load();
-            const today = new Date();
 
             months.forEach((monthName, monthIndex) => {
+                // LOGICA: Si el año es el actual, ocultar meses pasados
+                if (monthIndex < currentMonth) return;
+
                 const monthDiv = document.createElement('div');
                 monthDiv.className = 'month';
                 monthDiv.innerHTML = `<div class="month-title">${monthName} ${currentYear}</div>`;
@@ -158,12 +155,13 @@
                 for (let d = 1; d <= daysInMonth; d++) {
                     const dayId = `${monthIndex}-${d}`;
                     const dayData = savedData[dayId] || {};
-                    const isToday = today.getFullYear() === currentYear && today.getMonth() === monthIndex && today.getDate() === d;
+                    const isToday = currentYear === now.getFullYear() && monthIndex === currentMonth && d === now.getDate();
                     const holidayName = holidays2026[dayId];
                     
                     const dayDiv = document.createElement('div');
                     dayDiv.className = `day ${isToday ? 'today' : ''} ${holidayName ? 'holiday' : ''}`;
                     dayDiv.style.backgroundColor = dayData.color || (holidayName ? '#fff5f5' : 'white');
+                    
                     dayDiv.onclick = () => {
                         save(dayId, selectedToolColor, 'color');
                         currentEditingDayId = dayId;
