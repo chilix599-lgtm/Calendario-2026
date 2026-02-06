@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IAgenda</title>
+    <title>IAgenda 2026</title>
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png">
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png">
     
@@ -11,7 +11,7 @@
         :root { --primary: #2563eb; --festivo: #e11d48; --bg: #f8fafc; --has-note: #ffedd5; --has-note-border: #fdba74; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; color: #1e293b; padding-bottom: 40px; }
         
-        /* Botón de Notificaciones */
+        /* Notificaciones */
         #notif-banner {
             display: none; background: #1e293b; color: white; padding: 15px;
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -30,49 +30,51 @@
         }
 
         .calendar-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
             gap: 20px; padding: 0 20px;
+            align-items: stretch; /* Estira los elementos para que midan lo mismo en la misma fila */
         }
 
         .month { 
             background: white; padding: 15px; border-radius: 16px; 
             border: 1px solid #e2e8f0; display: flex; flex-direction: column;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); height: fit-content;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); 
+            min-height: 480px; /* Altura mínima para asegurar uniformidad en PC */
         }
 
         .month-title { text-align: center; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; color: #475569; letter-spacing: 1px; }
-        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; flex-grow: 1; }
         .day-header { text-align: center; font-size: 0.7rem; color: #94a3b8; font-weight: bold; padding-bottom: 8px; }
         
         .day { 
-            border: 1px solid #f1f5f9; width: 100%; aspect-ratio: 1 / 1.1; 
-            padding: 6px; border-radius: 10px; cursor: pointer; background: white;
+            border: 1px solid #f1f5f9; width: 100%; aspect-ratio: 1 / 1; 
+            padding: 4px; border-radius: 8px; cursor: pointer; background: white;
             display: flex; flex-direction: column; box-sizing: border-box;
             position: relative; overflow: hidden; transition: all 0.2s ease;
         }
 
         .day.has-content { background-color: var(--has-note) !important; border-color: var(--has-note-border) !important; }
-
-        .day-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
-        .day-number { font-size: 1rem; font-weight: 800; color: #1e293b; }
-        .weather-tag { font-size: 0.75rem; font-weight: 800; color: var(--primary); }
+        .day-header-row { display: flex; align-items: center; justify-content: space-between; }
+        .day-number { font-size: 0.9rem; font-weight: 800; color: #1e293b; }
+        .weather-tag { font-size: 0.7rem; font-weight: 800; color: var(--primary); }
 
         .day.holiday { background-color: #fff1f2; border-color: #fecdd3; }
         .day.empty { background-color: #f8fafc; border: 1px solid #f1f5f9; cursor: default; opacity: 0.4; }
         
         .holiday-label { 
-            font-size: 0.55rem; color: var(--festivo); font-weight: 800; 
-            text-align: center; line-height: 1; margin-bottom: 2px;
-            overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+            font-size: 0.5rem; color: var(--festivo); font-weight: 800; 
+            text-align: center; line-height: 1; margin-top: 1px;
+            white-space: nowrap; text-overflow: ellipsis; overflow: hidden;
         }
         
         .day-preview { 
-            font-size: 0.6rem; color: #64748b; text-align: center;
+            font-size: 0.55rem; color: #64748b; text-align: center;
             margin-top: auto; display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden; line-height: 1.1;
+            -webkit-box-orient: vertical; overflow: hidden; line-height: 1;
         }
 
-        .today { border: 2.5px solid var(--primary) !important; }
+        .today { border: 2px solid var(--primary) !important; box-shadow: 0 0 8px rgba(37,99,235,0.2); }
 
         .search-input { padding: 8px 15px; border-radius: 20px; border: 1px solid #e2e8f0; width: 180px; outline: none; }
         .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 1px solid #ddd; }
@@ -85,7 +87,7 @@
 <body>
 
     <div id="notif-banner">
-        <span style="font-size: 0.8rem;">🔔 ¿Quieres avisos diarios de tus notas a las 19:00?</span>
+        <span style="font-size: 0.8rem;">🔔 ¿Quieres avisos de tus notas de mañana a las 19:00?</span>
         <button onclick="requestNotificationPermission()">Activar</button>
     </div>
 
@@ -104,7 +106,6 @@
         <div class="modal-content">
             <div style="text-align:center; border-bottom:1px solid #eee; padding-bottom:10px;">
                 <h3 id="modalDate" style="margin:0; text-transform:capitalize;"></h3>
-                <div id="modalSub" style="color:#64748b; font-size:0.9rem; margin-top:5px;"></div>
                 <div id="modalHoliday" style="color:var(--festivo); font-weight:bold; font-size:0.8rem; margin-top:5px;"></div>
             </div>
             <textarea id="modalText" placeholder="Añade una nota..."></textarea>
@@ -117,14 +118,12 @@
         let currentDayId = null;
         let weatherData = { temp: "--", icon: "🌡️" };
         const now = new Date();
-        const yearActual = now.getFullYear();
+        const yearActual = 2026;
 
         const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
         const dayNames = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"];
         const holidays = { "1-0": "Año Nuevo", "6-0": "Reyes", "19-2": "San José/Padre", "7-3": "Bando Huerta", "1-4": "Trabajo", "3-4": "Madre", "9-5": "Murcia", "24-5": "San Juan", "15-7": "Asunción", "31-7": "San Ramón", "12-9": "Fiesta Nac.", "1-10": "T. Santos", "6-11": "Constitución", "8-11": "Inmaculada", "25-11": "Navidad" };
 
-        // --- LÓGICA DE NOTIFICACIONES ---
-        
         async function requestNotificationPermission() {
             const permission = await Notification.requestPermission();
             if (permission === "granted") {
@@ -136,38 +135,32 @@
 
         function checkDailyNotification() {
             if (localStorage.getItem('notif_enabled') !== 'true') return;
-
             setInterval(() => {
-                const now = new Date();
-                // Si son las 19:00 (7 PM)
-                if (now.getHours() === 19 && now.getMinutes() === 0) {
+                const hNow = new Date();
+                if (hNow.getHours() === 19 && hNow.getMinutes() === 0) {
                     sendReminder();
                 }
-            }, 60000); // Revisa cada minuto
+            }, 60000); 
         }
 
         function sendReminder() {
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             const id = `${tomorrow.getFullYear()}-${tomorrow.getMonth()}-${tomorrow.getDate()}`;
-            
             const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v8') || '{}');
             const entry = storage[id];
 
             if (entry && entry.text && entry.text.trim() !== "") {
-                new Notification("Agenda Murcia: Mañana tienes tareas", {
-                    body: `Nota: ${entry.text.substring(0, 50)}...`,
+                new Notification("Tarea para mañana", {
+                    body: `Mañana: ${entry.text}`,
                     icon: "https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png"
                 });
             }
         }
 
-        // Mostrar banner si es la primera vez
         if (!localStorage.getItem('notif_enabled') && Notification.permission !== "granted") {
             document.getElementById('notif-banner').style.display = 'flex';
         }
-
-        // --- CLIMA Y CALENDARIO (Misma lógica anterior) ---
 
         async function fetchWeather() {
             try {
@@ -190,6 +183,7 @@
 
             months.forEach((mName, mIdx) => {
                 if (mIdx < currentMonth) return;
+                
                 const mDiv = document.createElement('div'); mDiv.className = 'month';
                 mDiv.innerHTML = `<div class="month-title">${mName} ${yearActual}</div>`;
                 const grid = document.createElement('div'); grid.className = 'days-grid';
@@ -211,7 +205,10 @@
                     const dDiv = document.createElement('div');
                     dDiv.className = `day ${fest ? 'holiday' : ''} ${isToday ? 'today' : ''} ${hasText ? 'has-content' : ''}`;
                     dDiv.style.backgroundColor = hasText ? 'var(--has-note)' : (entry.color || 'white');
-                    if (query && !(entry.text && entry.text.toLowerCase().includes(query))) dDiv.style.opacity = "0.15";
+                    
+                    if (query && !(entry.text && entry.text.toLowerCase().includes(query))) {
+                        dDiv.style.opacity = "0.15";
+                    }
 
                     dDiv.innerHTML = `
                         <div class="day-header-row">
@@ -247,10 +244,12 @@
             renderCalendar();
         }
 
-        window.onclick = (e) => { if(e.target.className === 'modal') document.getElementById('dayModal').style.display = 'none'; }
+        window.onclick = (e) => { 
+            if(e.target.className === 'modal') document.getElementById('dayModal').style.display = 'none'; 
+        }
+
         fetchWeather();
         checkDailyNotification();
     </script>
 </body>
 </html>
-
