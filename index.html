@@ -138,6 +138,35 @@
     </div>
 
     <script>
+        
+// --- REGISTRO DEL SERVICE WORKER ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker registrado con éxito', reg))
+            .catch(err => console.error('Error al registrar el SW', err));
+    });
+}
+
+// Modificación de la función de notificación para usar el SW
+function sendNotification(titulo, mensaje) {
+    if (Notification.permission === "granted") {
+        if (navigator.serviceWorker.controller) {
+            // Si el SW está activo, lo enviamos a través de él
+            navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification(titulo, {
+                    body: mensaje,
+                    icon: 'https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png',
+                    vibrate: [200, 100, 200]
+                });
+            });
+        } else {
+            // Fallback: notificación normal si el SW no está listo
+            new Notification(titulo, { body: mensaje });
+        }
+    }
+}
+        
         let selectedColor = 'white';
         let currentDayId = null;
         let weatherData = { temp: "--", icon: "🌡️" };
@@ -309,4 +338,5 @@
     </script>
 </body>
 </html>
+
 
