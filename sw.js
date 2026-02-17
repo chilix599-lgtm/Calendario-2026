@@ -20,6 +20,7 @@ self.addEventListener('push', (e) => {
 self.addEventListener('notificationclick', (e) => {
     e.notification.close();
     e.waitUntil(
-        clients.openWindow('https://tu-usuario.github.io/tu-repo/') // CAMBIA ESTO POR TU URL
+        clients.openWindow('https://chilix599-lgtm.github.io/Calendario-2026/') //
     );
 });
+
