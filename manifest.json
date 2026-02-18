@@ -2,7 +2,7 @@
   "name": "Calendario 2026 Inteligente",
   "short_name": "Cal 2026",
   "description": "Calendario personalizable con notas y colores",
-  "start_url": "index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f0f2f5",
   "theme_color": "#007bff",
@@ -16,3 +16,4 @@
   ]
 
 }
+
