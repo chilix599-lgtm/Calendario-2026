@@ -138,56 +138,18 @@
     </div>
 
     <script>
-        // REGISTRO DEL SERVICE WORKER
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => {
-                console.log('SW registrado para: ', reg.scope);
-            })
-            .catch(err => console.log('Fallo al registrar SW: ', err));
-    });
-}
-
-// Cambia tu función de enviar notificaciones para que use el SW
 function sendNotification(titulo, mensaje) {
     if (Notification.permission === "granted") {
         navigator.serviceWorker.ready.then(registration => {
-            registration.showNotification(titulo, {
-                body: mensaje,
-                icon: 'https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png',
-                badge: 'https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png',
-                vibrate: [200, 100, 200]
-            });
-        });
-    }
-}
-        
-// --- REGISTRO DEL SERVICE WORKER ---
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker registrado con éxito', reg))
-            .catch(err => console.error('Error al registrar el SW', err));
-    });
-}
-
-// Modificación de la función de notificación para usar el SW
-function sendNotification(titulo, mensaje) {
-    if (Notification.permission === "granted") {
-        if (navigator.serviceWorker.controller) {
-            // Si el SW está activo, lo enviamos a través de él
-            navigator.serviceWorker.ready.then(registration => {
-                registration.showNotification(titulo, {
-                    body: mensaje,
-                    icon: 'https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png',
-                    vibrate: [200, 100, 200]
+            // Enviamos el mensaje al SW para que él gestione la notificación
+            if (registration.active) {
+                registration.active.postMessage({
+                    type: 'NOTIFICACION',
+                    title: titulo,
+                    message: mensaje
                 });
-            });
-        } else {
-            // Fallback: notificación normal si el SW no está listo
-            new Notification(titulo, { body: mensaje });
-        }
+            }
+        });
     }
 }
         
@@ -362,6 +324,7 @@ function sendNotification(titulo, mensaje) {
     </script>
 </body>
 </html>
+
 
 
 
