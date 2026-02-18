@@ -1,26 +1,29 @@
-// Nombre del caché
 const CACHE_NAME = 'iagenda-v1';
 
-// Escuchar el evento de instalación
 self.addEventListener('install', (e) => {
-    console.log('SW: Instalado');
+    self.skipWaiting();
 });
 
-// Escuchar notificaciones enviadas desde el sistema
-self.addEventListener('push', (e) => {
-    const data = e.data.json();
-    self.registration.showNotification(data.title, {
-        body: data.body,
-        icon: 'https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png',
-        vibrate: [200, 100, 200]
-    });
+self.addEventListener('activate', (e) => {
+    e.waitUntil(clients.claim());
 });
 
-// Manejar el clic en la notificación
+// Esto permite recibir órdenes de notificación del index.html
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'NOTIFICACION') {
+        self.registration.showNotification(event.data.title, {
+            body: event.data.message,
+            icon: 'https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png'
+        });
+    }
+});
+
 self.addEventListener('notificationclick', (e) => {
     e.notification.close();
     e.waitUntil(
-        clients.openWindow('https://chilix599-lgtm.github.io/Calendario-2026/') //
+        clients.matchAll({type: 'window'}).then(windowClients => {
+            if (windowClients.length > 0) return windowClients[0].focus();
+            return clients.openWindow('./');
+        })
     );
 });
-
