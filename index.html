@@ -28,8 +28,7 @@
 
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 0 20px; }
         .month { background: white; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); min-height: 480px; transition: transform 0.2s; }
-        .month:hover { transform: translateY(-4px); }
-        .month-title { text-align: center; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; color: #475569; letter-spacing: 1px; }
+        .month-title { text-align: center; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; color: #475569; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; flex-grow: 1; }
         .day-header { text-align: center; font-size: 0.7rem; color: #94a3b8; font-weight: bold; padding-bottom: 8px; }
         
@@ -38,39 +37,37 @@
             padding: 4px; border-radius: 8px; cursor: pointer; background: white;
             display: flex; flex-direction: column; position: relative; overflow: hidden; transition: all 0.2s ease;
         }
-
         .day.has-content { border: 2.5px solid var(--has-note-border) !important; }
         .day.holiday { background-color: #fff1f2 !important; }
-        .day.today { border: 2px solid var(--primary) !important; box-shadow: 0 0 8px rgba(37,99,235,0.2); }
-        .day.empty { opacity: 0.3; cursor: default; border: none; }
+        .day.today { border: 2px solid var(--primary) !important; }
+        .day.empty { opacity: 0.2; cursor: default; border: none; }
 
         .day-number { font-size: 0.9rem; font-weight: 800; }
         .weather-tag { font-size: 0.7rem; color: var(--primary); font-weight: bold; }
-        .holiday-label { font-size: 0.5rem; color: var(--festivo); font-weight: 800; text-align: center; }
         .day-preview { font-size: 0.55rem; color: #64748b; text-align: center; margin-top: auto; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-        .search-input { padding: 8px 15px; border-radius: 20px; border: 1px solid #e2e8f0; width: 140px; }
+        .search-input { padding: 8px 15px; border-radius: 20px; border: 1px solid #e2e8f0; width: 120px; }
         .color-dot { width: 25px; height: 25px; border-radius: 50%; cursor: pointer; border: 1px solid #ddd; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
         .modal-content { background: white; padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; }
-        .btn-voice { background: #ef4444; color: white; border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; margin: 10px 0; }
-        .btn-voice.recording { animation: pulse 1s infinite; }
+        .btn-voice { background: #ef4444; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; margin-bottom: 10px; }
+        .btn-voice.recording { animation: pulse 1s infinite; background: #b91c1c; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        textarea { width: 100%; height: 120px; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; resize: none; }
-        .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        textarea { width: 100%; height: 120px; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 1rem; box-sizing: border-box; }
+        .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 15px; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
     <div id="notif-banner">
-        <span>🔔 ¿Activar avisos cada hora y dictado de voz?</span>
+        <span>🔔 ¿Activar notificaciones y dictado?</span>
         <button onclick="requestNotificationPermission()">Activar</button>
     </div>
 
     <div class="header-controls">
         <input type="text" id="searchInput" class="search-input" placeholder="Buscar..." oninput="renderCalendar()">
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex; gap:10px;">
             <div onclick="selectedColor='white'" class="color-dot" style="background:white;"></div>
             <div onclick="selectedColor='#fee2e2'" class="color-dot" style="background:#fee2e2;"></div>
             <div onclick="selectedColor='#dcfce7'" class="color-dot" style="background:#dcfce7;"></div>
@@ -82,11 +79,13 @@
     <div id="dayModal" class="modal">
         <div class="modal-content">
             <h2 id="modalDayNum" style="font-size: 3rem; margin: 0; color: var(--primary);"></h2>
-            <p id="modalDayText" style="font-weight: bold; color: #64748b;"></p>
-            <div id="modalWeather"></div>
+            <p id="modalDayText" style="font-weight: bold; color: #64748b; margin-bottom: 5px;"></p>
+            <div id="modalWeather" style="margin-bottom: 15px;"></div>
+            
             <button id="voiceBtn" class="btn-voice">🎤</button>
-            <textarea id="modalText" placeholder="Escribe o dicta algo..."></textarea>
-            <button class="btn-save" onclick="saveData()">Guardar</button>
+            <textarea id="modalText" placeholder="Escribe o dicta tareas..."></textarea>
+            
+            <button class="btn-save" onclick="saveData()">Guardar Cambios</button>
         </div>
     </div>
 
@@ -100,11 +99,11 @@
         const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
         const dayNamesLong = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
         const dayNamesShort = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"];
-        const holidays = { "1-0": "Año Nuevo", "6-0": "Reyes", "1-4": "Trabajo", "15-7": "Asunción", "12-9": "Pilar", "1-10": "Todos Santos", "6-11": "Constitución", "25-11": "Navidad" };
+        const holidays = { "1-0": "Año Nuevo", "6-0": "Reyes", "19-2": "San José", "1-4": "Trabajo", "9-5": "Región Murcia", "15-7": "Asunción", "12-9": "Pilar", "1-10": "Todos Santos", "6-11": "Constitución", "25-11": "Navidad" };
 
-        // --- SERVICE WORKER ---
+        // --- REGISTRO SERVICE WORKER ---
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').then(() => console.log("SW Registrado"));
+            navigator.serviceWorker.register('./sw.js').then(reg => console.log("SW Activo"));
         }
 
         // --- NOTIFICACIONES ---
@@ -113,14 +112,18 @@
             if (permission === "granted") {
                 localStorage.setItem('notif_enabled', 'true');
                 document.getElementById('notif-banner').style.display = 'none';
-                sendNotification("¡Activado!", "Recibirás avisos cada hora.");
+                sendNotification("¡Sistema Listo!", "Recibirás avisos cada hora si mantienes la app abierta.");
             }
         }
 
         function sendNotification(titulo, mensaje) {
             if (Notification.permission === "granted") {
-                navigator.serviceWorker.ready.then(reg => {
-                    reg.active.postMessage({ type: 'NOTIFICACION', title: titulo, message: mensaje });
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.active.postMessage({
+                        type: 'NOTIFICACION',
+                        title: titulo,
+                        message: mensaje
+                    });
                 });
             }
         }
@@ -128,30 +131,18 @@
         function initAlarmSystem() {
             setInterval(() => {
                 const d = new Date();
-                // Cada hora en punto
+                // AVISO CADA HORA
                 if (d.getMinutes() === 0 && d.getSeconds() === 0) {
-                    sendNotification("IAgenda: Nueva hora", "Revisa tus tareas pendientes.");
+                    sendNotification("Recordatorio Hora: " + d.getHours() + ":00", "Revisa tus tareas pendientes de hoy.");
                 }
-                // Cada día a las 19:00 (mañana)
+                // AVISO DIARIO 19:00 PARA MAÑANA
                 if (d.getHours() === 19 && d.getMinutes() === 0 && d.getSeconds() === 0) {
                     const tom = new Date(); tom.setDate(tom.getDate() + 1);
                     const id = `${tom.getFullYear()}-${tom.getMonth()}-${tom.getDate()}`;
                     const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v8') || '{}');
-                    if (storage[id]?.text) sendNotification("Mañana tienes:", storage[id].text);
+                    if (storage[id]?.text) sendNotification("Mañana tienes tareas:", storage[id].text);
                 }
             }, 1000);
-        }
-
-        // --- CLIMA ---
-        async function fetchWeather() {
-            try {
-                const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.98&longitude=-1.13&current_weather=true');
-                const d = await r.json();
-                weatherData.temp = Math.round(d.current_weather.temperature) + "°C";
-                const c = d.current_weather.weathercode;
-                weatherData.icon = c === 0 ? "☀️" : c <= 3 ? "☁️" : "🌧️";
-                renderCalendar();
-            } catch(e) {}
         }
 
         // --- CALENDARIO ---
@@ -190,7 +181,6 @@
                             <span class="day-number">${d}</span>
                             ${isToday ? `<span class="weather-tag">${weatherData.icon} ${weatherData.temp}</span>` : ''}
                         </div>
-                        ${fest ? `<span class="holiday-label">${fest}</span>` : ''}
                         <div class="day-preview">${entry.text || ''}</div>
                     `;
                     dDiv.onclick = () => openModal(id, d, mName, mIdx);
@@ -201,23 +191,26 @@
         }
 
         // --- VOZ ---
-        const vBtn = document.getElementById('voiceBtn');
+        const voiceBtn = document.getElementById('voiceBtn');
         if ('webkitSpeechRecognition' in window) {
-            const rec = new webkitSpeechRecognition();
-            rec.lang = 'es-ES';
-            vBtn.onclick = () => rec.start();
-            rec.onstart = () => vBtn.classList.add('recording');
-            rec.onend = () => vBtn.classList.remove('recording');
-            rec.onresult = (e) => {
-                document.getElementById('modalText').value += (document.getElementById('modalText').value ? " " : "") + e.results[0][0].transcript;
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'es-ES';
+            voiceBtn.onclick = () => recognition.start();
+            recognition.onstart = () => voiceBtn.classList.add('recording');
+            recognition.onend = () => voiceBtn.classList.remove('recording');
+            recognition.onresult = (e) => {
+                const text = e.results[0][0].transcript;
+                document.getElementById('modalText').value += (document.getElementById('modalText').value ? " " : "") + text;
             };
         }
 
+        // --- MODAL ---
         function openModal(id, d, mName, mIdx) {
             currentDayId = id;
             const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v8') || '{}');
             document.getElementById('modalDayNum').innerText = d;
             document.getElementById('modalDayText').innerText = `${dayNamesLong[new Date(yearActual, mIdx, d).getDay()]}, ${mName}`;
+            document.getElementById('modalWeather').innerText = (mIdx === now.getMonth() && d === now.getDate()) ? `Hoy: ${weatherData.temp} ${weatherData.icon}` : "";
             document.getElementById('modalText').value = storage[id]?.text || "";
             document.getElementById('dayModal').style.display = 'flex';
         }
@@ -230,9 +223,19 @@
             renderCalendar();
         }
 
-        window.onclick = (e) => { if(e.target.className==='modal') document.getElementById('dayModal').style.display='none'; }
-        if (!localStorage.getItem('notif_enabled')) document.getElementById('notif-banner').style.display = 'flex';
+        window.onclick = (e) => { if(e.target.className === 'modal') document.getElementById('dayModal').style.display = 'none'; }
         
+        async function fetchWeather() {
+            try {
+                const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.98&longitude=-1.13&current_weather=true');
+                const d = await r.json();
+                weatherData.temp = Math.round(d.current_weather.temperature) + "°C";
+                weatherData.icon = d.current_weather.weathercode === 0 ? "☀️" : "☁️";
+                renderCalendar();
+            } catch(e) {}
+        }
+
+        if (!localStorage.getItem('notif_enabled')) document.getElementById('notif-banner').style.display = 'flex';
         fetchWeather();
         initAlarmSystem();
     </script>
