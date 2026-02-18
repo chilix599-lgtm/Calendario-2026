@@ -138,6 +138,30 @@
     </div>
 
     <script>
+        // REGISTRO DEL SERVICE WORKER
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => {
+                console.log('SW registrado para: ', reg.scope);
+            })
+            .catch(err => console.log('Fallo al registrar SW: ', err));
+    });
+}
+
+// Cambia tu función de enviar notificaciones para que use el SW
+function sendNotification(titulo, mensaje) {
+    if (Notification.permission === "granted") {
+        navigator.serviceWorker.ready.then(registration => {
+            registration.showNotification(titulo, {
+                body: mensaje,
+                icon: 'https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png',
+                badge: 'https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png',
+                vibrate: [200, 100, 200]
+            });
+        });
+    }
+}
         
 // --- REGISTRO DEL SERVICE WORKER ---
 if ('serviceWorker' in navigator) {
@@ -338,5 +362,6 @@ function sendNotification(titulo, mensaje) {
     </script>
 </body>
 </html>
+
 
 
