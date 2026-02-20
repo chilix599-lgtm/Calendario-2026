@@ -2,85 +2,100 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IAgenda 2026 - Murcia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IAgenda 2026</title>
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png">
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/chilix599-lgtm/Calendario-2026/main/lol.png">
     <link rel="manifest" href="manifest.json">
     
     <style>
         :root { --primary: #2563eb; --festivo: #e11d48; --bg: #f8fafc; --has-note-border: #fdba74; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; color: #1e293b; padding-bottom: 40px; }
+        * { box-sizing: border-box; } /* Evita que los bordes agranden los cuadros */
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 40px; }
         
         #notif-banner {
-            display: none; background: #1e293b; color: white; padding: 15px;
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 3000; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            align-items: center; gap: 15px; width: 90%; max-width: 400px;
+            display: none; background: #1e293b; color: white; padding: 12px;
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+            z-index: 3000; border-radius: 50px; width: 90%; max-width: 400px;
+            justify-content: center; align-items: center; gap: 10px;
         }
-        #notif-banner button { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        #notif-banner button { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer; }
 
         .header-controls { 
-            background: white; padding: 15px; display: flex; 
-            justify-content: center; gap: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px; align-items: center; position: sticky; top: 0; z-index: 100;
+            background: white; padding: 10px; display: flex; justify-content: center; 
+            gap: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;
         }
 
-        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; padding: 0 20px; }
-        .month { background: white; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); min-height: 520px; }
-        .month-title { text-align: center; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; color: #475569; font-size: 1.2rem; }
+        .calendar-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+            gap: 20px; padding: 15px; 
+        }
+
+        /* Contenedor del Mes: Altura fija para que nada se salga */
+        .month { 
+            background: white; padding: 12px; border-radius: 12px; 
+            border: 1px solid #e2e8f0; display: flex; flex-direction: column;
+            height: 480px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .month-title { text-align: center; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; color: #475569; }
+
+        /* Cuadrícula de días: Reparto exacto del espacio */
+        .days-grid { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            grid-template-rows: auto repeat(6, 1fr); /* Filas proporcionales */
+            gap: 4px; /* Espacio pequeño pero claro entre días */
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .day-header { text-align: center; font-size: 0.7rem; color: #94a3b8; font-weight: bold; padding-bottom: 4px; }
         
-        /* Espaciado de los días para que no se encimen */
-        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; flex-grow: 1; }
-        .day-header { text-align: center; font-size: 0.75rem; color: #94a3b8; font-weight: bold; padding-bottom: 5px; }
-        
+        /* Día individual: No puede crecer más allá de su celda */
         .day { 
-            border: 1px solid #f1f5f9; width: 100%; aspect-ratio: 1 / 1.1; 
-            padding: 6px; border-radius: 10px; cursor: pointer; background: white;
-            display: flex; flex-direction: column; position: relative; transition: all 0.2s ease;
-            box-sizing: border-box;
+            width: 100%; height: 100%;
+            padding: 4px; border-radius: 6px; cursor: pointer; background: white;
+            border: 1px solid #f1f5f9;
+            display: flex; flex-direction: column; justify-content: flex-start;
+            position: relative; transition: background 0.2s;
+            overflow: hidden; /* Corta el texto si es muy largo */
         }
-        .day:hover { transform: scale(1.03); z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         
-        .day.has-content { border: 3px solid var(--has-note-border) !important; }
-        
-        /* Estilo para Feriados */
+        .day.has-content { border: 2px solid var(--has-note-border) !important; }
         .day.holiday { background-color: #fff1f2 !important; border-color: #fecdd3; }
-        .day.holiday .day-number { color: var(--festivo); }
-        .holiday-label { font-size: 0.55rem; color: var(--festivo); font-weight: 800; text-align: center; line-height: 1; margin-top: 2px; }
+        .day.today { border: 2px solid var(--primary) !important; background: #eff6ff; }
+        .day.empty { visibility: hidden; }
 
-        .day.today { border: 2.5px solid var(--primary) !important; box-shadow: 0 0 10px rgba(37,99,235,0.2); }
-        .day.empty { opacity: 0; cursor: default; pointer-events: none; }
+        .day-number { font-size: 0.85rem; font-weight: 800; }
+        .holiday-label { font-size: 0.5rem; color: var(--festivo); font-weight: 800; line-height: 1; margin-top: 1px; }
+        .day-preview { font-size: 0.55rem; color: #64748b; margin-top: auto; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
-        .day-number { font-size: 1rem; font-weight: 800; }
-        .weather-tag { font-size: 0.7rem; color: var(--primary); font-weight: bold; }
-        .day-preview { font-size: 0.6rem; color: #64748b; text-align: center; margin-top: auto; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-style: italic; }
+        .search-input { padding: 6px 12px; border-radius: 20px; border: 1px solid #e2e8f0; width: 120px; }
+        .color-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid #ddd; }
 
-        .search-input { padding: 8px 15px; border-radius: 20px; border: 1px solid #e2e8f0; width: 140px; }
-        .color-dot { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid #ddd; }
-
+        /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-        .modal-content { background: white; padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; }
-        .btn-voice { background: #ef4444; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; margin-bottom: 10px; }
-        .btn-voice.recording { animation: pulse 1s infinite; background: #b91c1c; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        textarea { width: 100%; height: 120px; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 1rem; box-sizing: border-box; }
-        .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 15px; font-size: 1.1rem; }
+        .modal-content { background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; }
+        textarea { width: 100%; height: 100px; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; margin-top: 10px; }
+        .btn-save { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div id="notif-banner">
-        <span>🔔 ¿Activar aviso diario de las 19:00?</span>
+        <span>🔔 ¿Avisar a las 19:00?</span>
         <button onclick="requestNotificationPermission()">Activar</button>
     </div>
 
     <div class="header-controls">
         <input type="text" id="searchInput" class="search-input" placeholder="Buscar..." oninput="renderCalendar()">
-        <div style="display:flex; gap:12px;">
-            <div onclick="selectedColor='white'" class="color-dot" style="background:white;" title="Blanco"></div>
-            <div onclick="selectedColor='#fee2e2'" class="color-dot" style="background:#fee2e2;" title="Rojo Suave"></div>
-            <div onclick="selectedColor='#dcfce7'" class="color-dot" style="background:#dcfce7;" title="Verde Suave"></div>
+        <div style="display:flex; gap:8px;">
+            <div onclick="selectedColor='white'" class="color-dot" style="background:white;"></div>
+            <div onclick="selectedColor='#fee2e2'" class="color-dot" style="background:#fee2e2;"></div>
+            <div onclick="selectedColor='#dcfce7'" class="color-dot" style="background:#dcfce7;"></div>
         </div>
     </div>
 
@@ -88,11 +103,9 @@
 
     <div id="dayModal" class="modal">
         <div class="modal-content">
-            <h2 id="modalDayNum" style="font-size: 3.5rem; margin: 0; color: var(--primary);"></h2>
-            <p id="modalDayText" style="font-weight: bold; color: #64748b; margin-bottom: 5px;"></p>
-            <div id="modalWeather" style="margin-bottom: 15px;"></div>
-            <button id="voiceBtn" class="btn-voice">🎤</button>
-            <textarea id="modalText" placeholder="Tareas para este día..."></textarea>
+            <h2 id="modalDayNum" style="margin:0; color:var(--primary);"></h2>
+            <p id="modalDayText" style="color:#64748b; font-size:0.9rem;"></p>
+            <textarea id="modalText"></textarea>
             <button class="btn-save" onclick="saveData()">Guardar</button>
         </div>
     </div>
@@ -100,60 +113,32 @@
     <script>
         let selectedColor = 'white';
         let currentDayId = null;
-        let weatherData = { temp: "--", icon: "🌡️" };
         const yearActual = 2026;
         const now = new Date();
 
         const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
-        const dayNamesLong = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
         const dayNamesShort = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"];
+        const holidays = { "1-0": "Año Nuevo", "6-0": "Reyes", "19-2": "San José", "2-3": "Jueves Santo", "3-3": "Viernes Santo", "1-4": "Trabajo", "9-5": "Murcia", "15-7": "Asunción", "12-9": "Pilar", "1-10": "Todos Santos", "6-11": "Constitución", "25-11": "Navidad" };
 
-        // Feriados 2026 (Nacionales y Murcia)
-        const holidays = { 
-            "1-0": "Año Nuevo", "6-0": "Reyes", "19-2": "San José", 
-            "2-3": "Jueves Santo", "3-3": "Viernes Santo", "7-3": "Bando de la Huerta",
-            "1-4": "Día del Trabajo", "9-5": "Día de Murcia", "15-7": "Asunción", 
-            "8-8": "Romería Murcia", "12-9": "Fiesta Nacional", "1-10": "Todos Santos", 
-            "6-11": "Constitución", "8-11": "Inmaculada", "25-11": "Navidad" 
-        };
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js');
-        }
-
-        async function requestNotificationPermission() {
-            const permission = await Notification.requestPermission();
-            if (permission === "granted") {
-                localStorage.setItem('notif_enabled', 'true');
-                document.getElementById('notif-banner').style.display = 'none';
-                sendNotification("¡Configurado!", "Te avisaré cada día a las 19:00 sobre tus tareas de mañana.");
-            }
-        }
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
 
         function sendNotification(titulo, mensaje) {
             if (Notification.permission === "granted") {
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.active.postMessage({ type: 'NOTIFICACION', title: titulo, message: mensaje });
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.active.postMessage({ type: 'NOTIFICACION', title: titulo, message: mensaje });
                 });
             }
         }
 
-        // Lógica de alarma solo a las 19:00
         function initAlarmSystem() {
             setInterval(() => {
                 const d = new Date();
-                // Si son las 19:00:00 exactas
                 if (d.getHours() === 19 && d.getMinutes() === 0 && d.getSeconds() === 0) {
-                    const tom = new Date(); 
-                    tom.setDate(tom.getDate() + 1);
+                    const tom = new Date(); tom.setDate(tom.getDate() + 1);
                     const id = `${tom.getFullYear()}-${tom.getMonth()}-${tom.getDate()}`;
                     const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v8') || '{}');
-                    
-                    if (storage[id]?.text && storage[id].text.trim() !== "") {
-                        sendNotification("Tareas para mañana:", storage[id].text);
-                    } else {
-                        sendNotification("Agenda", "No tienes tareas anotadas para mañana.");
-                    }
+                    const texto = storage[id]?.text || "Sin tareas pendientes.";
+                    sendNotification("Mañana tienes:", texto);
                 }
             }, 1000);
         }
@@ -166,7 +151,7 @@
 
             months.forEach((mName, mIdx) => {
                 const mDiv = document.createElement('div'); mDiv.className = 'month';
-                mDiv.innerHTML = `<div class="month-title">${mName} ${yearActual}</div>`;
+                mDiv.innerHTML = `<div class="month-title">${mName}</div>`;
                 const grid = document.createElement('div'); grid.className = 'days-grid';
                 dayNamesShort.forEach(h => grid.innerHTML += `<div class="day-header">${h}</div>`);
 
@@ -179,49 +164,31 @@
                 for(let d=1; d<=total; d++) {
                     const id = `${yearActual}-${mIdx}-${d}`;
                     const entry = storage[id] || {};
-                    const isToday = (mIdx === now.getMonth() && d === now.getDate() && yearActual === now.getFullYear());
-                    const festNombre = holidays[`${d}-${mIdx}`];
+                    const isToday = (mIdx === now.getMonth() && d === now.getDate());
+                    const fest = holidays[`${d}-${mIdx}`];
 
                     const dDiv = document.createElement('div');
-                    dDiv.className = `day ${festNombre ? 'holiday' : ''} ${isToday ? 'today' : ''} ${entry.text ? 'has-content' : ''}`;
+                    dDiv.className = `day ${fest ? 'holiday' : ''} ${isToday ? 'today' : ''} ${entry.text ? 'has-content' : ''}`;
                     dDiv.style.backgroundColor = entry.color || 'white';
-                    
-                    if (query && !entry.text?.toLowerCase().includes(query)) dDiv.style.opacity = "0.2";
+                    if (query && !entry.text?.toLowerCase().includes(query)) dDiv.style.opacity = "0.1";
 
                     dDiv.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items: flex-start;">
-                            <span class="day-number">${d}</span>
-                            ${isToday ? `<span class="weather-tag">${weatherData.icon} ${weatherData.temp}</span>` : ''}
-                        </div>
-                        ${festNombre ? `<span class="holiday-label">${festNombre}</span>` : ''}
+                        <span class="day-number">${d}</span>
+                        ${fest ? `<span class="holiday-label">${fest}</span>` : ''}
                         <div class="day-preview">${entry.text || ''}</div>
                     `;
-                    dDiv.onclick = () => openModal(id, d, mName, mIdx);
+                    dDiv.onclick = () => openModal(id, d, mName);
                     grid.appendChild(dDiv);
                 }
                 mDiv.appendChild(grid); container.appendChild(mDiv);
             });
         }
 
-        const voiceBtn = document.getElementById('voiceBtn');
-        if ('webkitSpeechRecognition' in window) {
-            const recognition = new webkitSpeechRecognition();
-            recognition.lang = 'es-ES';
-            voiceBtn.onclick = () => recognition.start();
-            recognition.onstart = () => voiceBtn.classList.add('recording');
-            recognition.onend = () => voiceBtn.classList.remove('recording');
-            recognition.onresult = (e) => {
-                const text = e.results[0][0].transcript;
-                document.getElementById('modalText').value += (document.getElementById('modalText').value ? " " : "") + text;
-            };
-        }
-
-        function openModal(id, d, mName, mIdx) {
+        function openModal(id, d, mName) {
             currentDayId = id;
             const storage = JSON.parse(localStorage.getItem('agenda_perpetua_v8') || '{}');
             document.getElementById('modalDayNum').innerText = d;
-            document.getElementById('modalDayText').innerText = `${dayNamesLong[new Date(yearActual, mIdx, d).getDay()]}, ${mName}`;
-            document.getElementById('modalWeather').innerText = (mIdx === now.getMonth() && d === now.getDate()) ? `Clima hoy: ${weatherData.temp} ${weatherData.icon}` : "";
+            document.getElementById('modalDayText').innerText = mName;
             document.getElementById('modalText').value = storage[id]?.text || "";
             document.getElementById('dayModal').style.display = 'flex';
         }
@@ -234,20 +201,18 @@
             renderCalendar();
         }
 
-        window.onclick = (e) => { if(e.target.className === 'modal') document.getElementById('dayModal').style.display = 'none'; }
-        
-        async function fetchWeather() {
-            try {
-                const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.98&longitude=-1.13&current_weather=true');
-                const d = await r.json();
-                weatherData.temp = Math.round(d.current_weather.temperature) + "°C";
-                weatherData.icon = d.current_weather.weathercode === 0 ? "☀️" : "☁️";
-                renderCalendar();
-            } catch(e) {}
+        function requestNotificationPermission() {
+            Notification.requestPermission().then(p => {
+                if (p === 'granted') {
+                    localStorage.setItem('notif_enabled', 'true');
+                    document.getElementById('notif-banner').style.display = 'none';
+                }
+            });
         }
 
+        window.onclick = (e) => { if(e.target.className === 'modal') document.getElementById('dayModal').style.display = 'none'; }
         if (!localStorage.getItem('notif_enabled')) document.getElementById('notif-banner').style.display = 'flex';
-        fetchWeather();
+        renderCalendar();
         initAlarmSystem();
     </script>
 </body>
